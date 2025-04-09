@@ -1,0 +1,118 @@
+############
+1. Stos technologiczny
+{{tech-stack}}
+############
+
+Frontend - Astro z React dla komponentów interaktywnych:
+- Astro 5 pozwala na tworzenie szybkich, wydajnych stron i aplikacji z minimalną ilością JavaScript
+- React 19 zapewni interaktywność tam, gdzie jest potrzebna
+- TypeScript 5 dla statycznego typowania kodu i lepszego wsparcia IDE
+- Tailwind 4 pozwala na wygodne stylowanie aplikacji
+- Shadcn/ui zapewnia bibliotekę dostępnych komponentów React, na których oprzemy UI
+
+Backend - Supabase jako kompleksowe rozwiązanie backendowe:
+- Zapewnia bazę danych PostgreSQL
+- Zapewnia SDK w wielu językach, które posłużą jako Backend-as-a-Service
+- Jest rozwiązaniem open source, które można hostować lokalnie lub na własnym serwerze
+- Posiada wbudowaną autentykację użytkowników
+
+AI - Komunikacja z modelami przez usługę Openrouter.ai:
+- Dostęp do szerokiej gamy modeli (OpenAI, Anthropic, Google i wiele innych), które pozwolą nam znaleźć rozwiązanie zapewniające wysoką efektywność i niskie koszta
+- Pozwala na ustawianie limitów finansowych na klucze API
+
+CI/CD i Hosting:
+- Github Actions do tworzenia pipeline’ów CI/CD
+- DigitalOcean do hostowania aplikacji za pośrednictwem obrazu docker
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#############
+2. Analiza stacku
+#############
+
+<tech-stack>
+{{tech-stack}} <- wprowadź tutaj opis swojego stacku 
+<tech-stack>
+
+Dokonaj krytycznej lecz rzeczowej analizy czy <tech-stack> odpowiednio adresuje potrzeby @prd.md. Rozważ następujące pytania:
+1. Czy technologia pozwoli nam szybko dostarczyć MVP?
+2. Czy rozwiązanie będzie skalowalne w miarę wzrostu projektu?
+3. Czy koszt utrzymania i rozwoju będzie akceptowalny?
+4. Czy potrzebujemy aż tak złożonego rozwiązania?
+5. Czy nie istnieje prostsze podejście, które spełni nasze wymagania?
+6. Czy technologie pozwoli nam zadbać o odpowiednie bezpieczeństwo?
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+##############
+
+Oto analiza krytyczna przedstawionego zestawu technologicznego:
+
+1. **Szybkie dostarczenie MVP:**  
+   - **Astro 5 + React 19:** Astro umożliwia generowanie statycznych stron z interaktywnymi komponentami React tylko tam, gdzie są niezbędne, co może przyspieszyć proces wdrożenia MVP.  
+   - **TypeScript 5:** Poprawia jakość kodu i ułatwia utrzymanie, co jest korzystne na wczesnym etapie projektu.  
+   - **Tailwind 4 & Shadcn/ui:** Umożliwiają szybkie tworzenie estetycznego UI bez konieczności tworzenia wszystkich komponentów od podstaw.
+
+2. **Skalowalność rozwiązania:**  
+   - **Backend w Supabase:** Zapewnia wbudowaną bazę danych PostgreSQL i mechanizmy autentykacji, co pozwala na względnie łatwe skalowanie w miarę rozwoju projektu.  
+   - **AI przez Openrouter.ai:** Umożliwia dostęp do różnych modeli i łatwe dostosowywanie limitów, co daje elastyczność w rozwoju funkcjonalności.
+   - **CI/CD (Github Actions) oraz DigitalOcean:** Ułatwiają automatyzację wdrożeń i monitoring środowiska produkcyjnego, co jest kluczowe przy skalowaniu.
+
+3. **Koszty utrzymania i rozwoju:**  
+   - Korzystając z rozwiązań takich jak Supabase (który oferuje darmowe i niskokosztowe plany) oraz chmurowych usług do hostingu, można utrzymać koszty na akceptowalnym poziomie.  
+   - Narzędzia takie jak Astro i Tailwind redukują czas tworzenia interfejsów, co przekłada się na mniejsze nakłady pracy.  
+   - Wprowadzenie wielu technologii (np. integracja z wieloma modelami AI) może wymagać dodatkowej wiedzy i nakładów na utrzymanie, co trzeba uwzględnić przy budżetowaniu.
+
+4. **Złożoność rozwiązania:**  
+   - Zestaw technologiczny jest kompleksowy, co może być ponad miarę, jeżeli projekt ma prostą funkcjonalność.  
+   - Warto rozważyć, czy pełen wachlarz usług (np. kilka modeli AI, pełna funkcjonalność CI/CD, autentykacja od Supabase) jest na danym etapie niezbędny, czy można zacząć od lżejszych rozwiązań i rozwijać je wraz z rosnącymi potrzebami.
+
+5. **Alternatywne, prostsze podejście:**  
+   - Jeśli projekt nie wymaga dużej interaktywności czy skomplikowanej logiki backendowej, można rozważyć bardziej skoncentrowane podejście z jednym frameworkiem (np. Next.js z własną implementacją backendu) zamiast wielu wyspecjalizowanych narzędzi.  
+   - W przypadku ograniczonych zasobów, uproszczenie stosu technologicznego może przyspieszyć wdrożenie i obniżyć koszty utrzymania.
+
+6. **Bezpieczeństwo:**  
+   - **Supabase:** Zapewnia standardowe mechanizmy zabezpieczeń, ale wymaga odpowiedniej konfiguracji (np. reguły dostępu w bazie, zabezpieczenie endpointów).  
+   - **Autentykacja:** Wbudowane mechanizmy autentykacji Supabase pomagają w ochronie aplikacji, ale zawsze warto dokonać audytu bezpieczeństwa przed wdrożeniem do produkcji.  
+   - **AI i API:** Konieczne jest wdrożenie limitów finansowych i monitoringu użycia, aby zapobiec nadużyciom i niespodziewanym kosztom.
+
+**Podsumowanie:**  
+Zestaw technologiczny jest nowoczesny i kompleksowy, co sprzyja szybkiemu wdrożeniu MVP oraz posiada potencjał do skalowania projektu. Jednakże, zależnie od rzeczywistych wymagań oraz dostępnych zasobów, może warto rozważyć uproszczenie niektórych elementów na początkowych etapach, aby ograniczyć ryzyko nadmiernej złożoności oraz kosztów utrzymania. Wprowadzenie rozwiązań z zakresu CI/CD oraz chmurowego hostingu przynosi korzyści w dłuższej perspektywie, pod warunkiem że zostaną właściwie skonfigurowane.
+Odp. 2
+##############
+
+Oto analiza krytyczna przedstawionego zestawu technologicznego:
+
+1. **Szybkie dostarczenie MVP:**  
+   - **Astro 5 + React 19:** Astro umożliwia generowanie statycznych stron z interaktywnymi komponentami React tylko tam, gdzie są niezbędne, co może przyspieszyć proces wdrożenia MVP.  
+   - **TypeScript 5:** Poprawia jakość kodu i ułatwia utrzymanie, co jest korzystne na wczesnym etapie projektu.  
+   - **Tailwind 4 & Shadcn/ui:** Umożliwiają szybkie tworzenie estetycznego UI bez konieczności tworzenia wszystkich komponentów od podstaw.
+
+2. **Skalowalność rozwiązania:**  
+   - **Backend w Supabase:** Zapewnia wbudowaną bazę danych PostgreSQL i mechanizmy autentykacji, co pozwala na względnie łatwe skalowanie w miarę rozwoju projektu.  
+   - **AI przez Openrouter.ai:** Umożliwia dostęp do różnych modeli i łatwe dostosowywanie limitów, co daje elastyczność w rozwoju funkcjonalności.
+   - **CI/CD (Github Actions) oraz DigitalOcean:** Ułatwiają automatyzację wdrożeń i monitoring środowiska produkcyjnego, co jest kluczowe przy skalowaniu.
+
+3. **Koszty utrzymania i rozwoju:**  
+   - Korzystając z rozwiązań takich jak Supabase (który oferuje darmowe i niskokosztowe plany) oraz chmurowych usług do hostingu, można utrzymać koszty na akceptowalnym poziomie.  
+   - Narzędzia takie jak Astro i Tailwind redukują czas tworzenia interfejsów, co przekłada się na mniejsze nakłady pracy.  
+   - Wprowadzenie wielu technologii (np. integracja z wieloma modelami AI) może wymagać dodatkowej wiedzy i nakładów na utrzymanie, co trzeba uwzględnić przy budżetowaniu.
+
+4. **Złożoność rozwiązania:**  
+   - Zestaw technologiczny jest kompleksowy, co może być ponad miarę, jeżeli projekt ma prostą funkcjonalność.  
+   - Warto rozważyć, czy pełen wachlarz usług (np. kilka modeli AI, pełna funkcjonalność CI/CD, autentykacja od Supabase) jest na danym etapie niezbędny, czy można zacząć od lżejszych rozwiązań i rozwijać je wraz z rosnącymi potrzebami.
+
+5. **Alternatywne, prostsze podejście:**  
+   - Jeśli projekt nie wymaga dużej interaktywności czy skomplikowanej logiki backendowej, można rozważyć bardziej skoncentrowane podejście z jednym frameworkiem (np. Next.js z własną implementacją backendu) zamiast wielu wyspecjalizowanych narzędzi.  
+   - W przypadku ograniczonych zasobów, uproszczenie stosu technologicznego może przyspieszyć wdrożenie i obniżyć koszty utrzymania.
+
+6. **Bezpieczeństwo:**  
+   - **Supabase:** Zapewnia standardowe mechanizmy zabezpieczeń, ale wymaga odpowiedniej konfiguracji (np. reguły dostępu w bazie, zabezpieczenie endpointów).  
+   - **Autentykacja:** Wbudowane mechanizmy autentykacji Supabase pomagają w ochronie aplikacji, ale zawsze warto dokonać audytu bezpieczeństwa przed wdrożeniem do produkcji.  
+   - **AI i API:** Konieczne jest wdrożenie limitów finansowych i monitoringu użycia, aby zapobiec nadużyciom i niespodziewanym kosztom.
+
+**Podsumowanie:**  
+Zestaw technologiczny jest nowoczesny i kompleksowy, co sprzyja szybkiemu wdrożeniu MVP oraz posiada potencjał do skalowania projektu. Jednakże, zależnie od rzeczywistych wymagań oraz dostępnych zasobów, może warto rozważyć uproszczenie niektórych elementów na początkowych etapach, aby ograniczyć ryzyko nadmiernej złożoności oraz kosztów utrzymania. Wprowadzenie rozwiązań z zakresu CI/CD oraz chmurowego hostingu przynosi korzyści w dłuższej perspektywie, pod warunkiem że zostaną właściwie skonfigurowane.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
