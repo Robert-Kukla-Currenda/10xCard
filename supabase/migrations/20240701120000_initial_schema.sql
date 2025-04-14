@@ -99,10 +99,3 @@ create index idx_logs_flashcard_id on logs(flashcard_id);
 create view user_flashcards as
     select id, user_id, content, summary, source, created_at, updated_at
     from flashcards;
-
--- enable row level security on views
-alter view user_flashcards enable row level security;
-
--- create policy for the view
-create policy "users can view their flashcards" on user_flashcards
-    for select using (auth.uid() = user_id);
