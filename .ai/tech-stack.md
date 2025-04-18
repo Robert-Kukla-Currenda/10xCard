@@ -1,11 +1,21 @@
-1. Technologia umożliwia szybkie dostarczenie MVP – Astro w wersji 5 wraz z React 19 oraz Tailwind 4 zapewniają szybkie tworzenie interfejsu, co jest zgodne z wymaganiami z [prd.md](c:\Projekty\_szkolenia\10xDevs\10xCards\.ai\prd.md).
+# Stos technologiczny
 
-2. Rozwiązanie jest skalowalne – Supabase zapewnia bazę PostgreSQL i autentykację, a technologie CI/CD (Github Actions) oraz DigitalOcean umożliwiają łatwą rozbudowę infrastruktury.
+## 1. Frontend
+- framework Blazor:
+- MudBlazor jako biblioteka componentów wizualnych
+- CSS zapewnia proste i szybkie stylowanie
 
-3. Koszty utrzymania i rozwoju są kontrolowane – wybrane technologie, takie jak open source Supabase oraz narzędzia oferujące niskie koszty, pozwalają na akceptowalny budżet.
+## 2. Backend 
+- .NET 8 jako stabilna i łatwa platforma umożliwiająca budowanie wszechstronnych aplikacji.
+- Baza danych: Postgres 17
 
-4. Złożoność rozwiązania jest umiarkowana – choć stos technologiczny jest rozbudowany, dobór technologii celowo zapewnia wysoką wydajność MVP; jednak istnieje ryzyko przepelnienia narzędziami, jeśli wymagania będą bardziej proste.
 
-5. Istnieje alternatywa – np. Next.js zamiast Astro + React mógłby uprościć stack, ale obecne rozwiązanie spełnia potrzeby oraz zapewnia elastyczność przy zachowaniu wydajności.
+## 3. AI
+Komunikacja z modelami przez usługę Openrouter.ai:
+Dostęp do szerokiej gamy modeli (OpenAI, Anthropic, Google i wiele innych), które pozwolą nam znaleźć rozwiązanie zapewniające wysoką efektywność i niskie koszta
+Pozwala na ustawianie limitów finansowych na klucze API
 
-6. Technologie zadbają o bezpieczeństwo – Supabase oferuje wbudowaną autentykację, a dodatkowe narzędzia (np. limity API w Openrouter.ai) pomagają kontrolować ryzyko nadużyć.
+## 4. CI/CD
+CI/CD i Hosting:
+Github Actions do tworzenia pipeline’ów CI/CD
+DigitalOcean do hostowania aplikacji za pośrednictwem obrazu docker
