@@ -53,20 +53,24 @@ namespace TenXCards.API.Models
     /// <summary>
     /// Command model for creating a manual flashcard.
     /// </summary>
-    public class CreateManualCardCommand
+    public class SaveCardCommand
     {
         [Required]
         [StringLength(1000, MinimumLength = 1)]
         public string Front { get; set; } = default!;
-        
+
         [Required]
         [StringLength(5000, MinimumLength = 1)]
         public string Back { get; set; } = default!;
 
-        // Should be "human" for manual cards.
+        // Possible values: "AI" or "human"
         [Required]
         [StringLength(10)]
-        public string GeneratedBy { get; set; } = "human";
+        public required string GeneratedBy { get; set; }
+
+        // Field for original content
+        [StringLength(10000, MinimumLength = 1000)]
+        public string OriginalContent { get; set; } = default!;
     }
 
     /// <summary>

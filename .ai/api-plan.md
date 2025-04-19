@@ -92,19 +92,25 @@
 
 ### 2.2. Cards
 
-#### Create Manual Card
+#### Create Card
 - **Method:** POST  
 - **URL:** `/cards`  
-- **Description:** Creates a new flashcard manually.  
+- **Description:** Save a new flashcard.  
 - **Headers:** `Authorization: Bearer JWT_TOKEN_HERE`  
 - **Request Payload:**
     ```json
     {
       "front": "Question text...",
       "back": "Answer text...",
-      "generated_by": "human"
+      "generated_by": "human",
+      "original_content": "original text content...",      
     }
     ```
+- **Field Validations:**
+    - `front`: Required, 1-1000 characters
+    - `back`: Required, 1-5000 characters
+    - `generated_by`: Required, must be either "AI" or "human"
+    - `original_content`: Optional for manual cards, required for AI-generated (1000-10000 characters)    
 - **Response:**
     ```json
     {
@@ -113,11 +119,16 @@
       "front": "Question text...",
       "back": "Answer text...",
       "generated_by": "human",
-      "created_at": "2025-04-19T12:05:00Z"
+      "original_content": "Optional original text content...",
+      "created_at": "2025-04-19T12:05:00Z",
+      "updated_at": null
     }
     ```
 - **Success Codes:** 201 Created  
-- **Error Codes:** 400 Bad Request, 401 Unauthorized
+- **Error Codes:** 
+    - 400 Bad Request (validation errors)
+    - 401 Unauthorized
+    - 422 Unprocessable Entity (business rule violations)
 
 #### Generate Card using AI
 - **Method:** POST  
