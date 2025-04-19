@@ -5,16 +5,14 @@ namespace TenXCards.API.Data;
 
 public partial class ApplicationDbContext : DbContext
 {
-    public ApplicationDbContext()
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
     {
     }
 
     public DbSet<User> Users { get; set; } = default!;
     public DbSet<Card> Cards { get; set; } = default!;
     public DbSet<ErrorLog> ErrorLogs { get; set; } = default!;
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseNpgsql("Host=localhost:5433;Database=ten_x_cards;Username=postgres;Password=postgres");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
