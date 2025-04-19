@@ -33,6 +33,7 @@
 - Indeks na kolumnie `users.email` (unikalny).  
 - Indeks na kolumnie `users(first_name, last_name)` dla optymalizacji wyszukiwania po nazwie użytkownika.  
 - Indeks na kolumnie `cards.user_id` dla szybkiego filtrowania fiszek według użytkownika.  
+- Indeks na kolumnie `cards.generated_by` dla szybkiego filtrowania fiszek według sposobu generowania.
 - Opcjonalnie: pełnotekstowy indeks (np. GIN) na kolumnach `cards.original_content`, `cards.front` i `cards.back` w celu optymalizacji wyszukiwania słów kluczowych.
 
 ## 4. Zasady PostgreSQL - Row Level Security (RLS)
