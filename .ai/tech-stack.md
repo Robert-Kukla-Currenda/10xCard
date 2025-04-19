@@ -7,7 +7,8 @@
 
 ## 2. Backend 
 - .NET 8 jako stabilna i łatwa platforma umożliwiająca budowanie wszechstronnych aplikacji.
-- Baza danych: Postgres 17
+- Microsoft Entity Framework: ORM (Object-Relational Mapping) dla .NET, umożliwiający łatwe mapowanie obiektów na tabele w bazie danych PostgreSQL.
+- Baza danych: Postgres 17.
 
 
 ## 3. AI
