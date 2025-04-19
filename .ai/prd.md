@@ -11,6 +11,8 @@ Manualne tworzenie fiszek jest czasochłonne, co zniechęca użytkowników do ko
    - System przyjmuje tekst o długości od 1000 do 10000 znaków.
    - Użycie technik streszczenia i redakcji treści do wygenerowania fiszki.
    - Użytkownik ma możliwość edycji treści wygenerowanej przez AI przed zatwierdzeniem.
+   - Tekst na frontowej strona fiszki nie może być dłuższy niż 1000 znaków.
+   - Tekst fiszki, nie może być dłuższy niż 5000 znaków.
    
 2. Manualne tworzenie fiszek
    - Umożliwienie użytkownikowi tworzenia, edycji, przeglądania i usuwania fiszek ręcznie.
