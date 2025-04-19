@@ -1,6 +1,0 @@
-@_10xCards.API_HostAddress = http://localhost:5171
-
-GET {{_10xCards.API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
