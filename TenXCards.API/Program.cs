@@ -13,6 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MainDatabase")));
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICardAIService, CardAIService>();
 
 var app = builder.Build();
 
