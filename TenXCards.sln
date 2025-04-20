@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TenXCards.API", "TenXCards.API\TenXCards.API.csproj", "{97C1CF2C-9DDA-4470-B347-70702FA34C6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TenXCards.Frontend", "TenXCards.Frontend\TenXCards.Frontend.csproj", "{8FE95986-B7B9-4F6A-A5A9-C73B33F2DF3E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TenXCards.Frontend", "TenXCards.Frontend\TenXCards.Frontend.csproj", "{B367A164-870C-4F7D-9C5D-F3270CD21B39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,18 +29,18 @@ Global
 		{97C1CF2C-9DDA-4470-B347-70702FA34C6B}.Release|x64.Build.0 = Release|Any CPU
 		{97C1CF2C-9DDA-4470-B347-70702FA34C6B}.Release|x86.ActiveCfg = Release|Any CPU
 		{97C1CF2C-9DDA-4470-B347-70702FA34C6B}.Release|x86.Build.0 = Release|Any CPU
-		{8FE95986-B7B9-4F6A-A5A9-C73B33F2DF3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8FE95986-B7B9-4F6A-A5A9-C73B33F2DF3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8FE95986-B7B9-4F6A-A5A9-C73B33F2DF3E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{8FE95986-B7B9-4F6A-A5A9-C73B33F2DF3E}.Debug|x64.Build.0 = Debug|Any CPU
-		{8FE95986-B7B9-4F6A-A5A9-C73B33F2DF3E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{8FE95986-B7B9-4F6A-A5A9-C73B33F2DF3E}.Debug|x86.Build.0 = Debug|Any CPU
-		{8FE95986-B7B9-4F6A-A5A9-C73B33F2DF3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8FE95986-B7B9-4F6A-A5A9-C73B33F2DF3E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8FE95986-B7B9-4F6A-A5A9-C73B33F2DF3E}.Release|x64.ActiveCfg = Release|Any CPU
-		{8FE95986-B7B9-4F6A-A5A9-C73B33F2DF3E}.Release|x64.Build.0 = Release|Any CPU
-		{8FE95986-B7B9-4F6A-A5A9-C73B33F2DF3E}.Release|x86.ActiveCfg = Release|Any CPU
-		{8FE95986-B7B9-4F6A-A5A9-C73B33F2DF3E}.Release|x86.Build.0 = Release|Any CPU
+		{B367A164-870C-4F7D-9C5D-F3270CD21B39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B367A164-870C-4F7D-9C5D-F3270CD21B39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B367A164-870C-4F7D-9C5D-F3270CD21B39}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B367A164-870C-4F7D-9C5D-F3270CD21B39}.Debug|x64.Build.0 = Debug|Any CPU
+		{B367A164-870C-4F7D-9C5D-F3270CD21B39}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B367A164-870C-4F7D-9C5D-F3270CD21B39}.Debug|x86.Build.0 = Debug|Any CPU
+		{B367A164-870C-4F7D-9C5D-F3270CD21B39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B367A164-870C-4F7D-9C5D-F3270CD21B39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B367A164-870C-4F7D-9C5D-F3270CD21B39}.Release|x64.ActiveCfg = Release|Any CPU
+		{B367A164-870C-4F7D-9C5D-F3270CD21B39}.Release|x64.Build.0 = Release|Any CPU
+		{B367A164-870C-4F7D-9C5D-F3270CD21B39}.Release|x86.ActiveCfg = Release|Any CPU
+		{B367A164-870C-4F7D-9C5D-F3270CD21B39}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
