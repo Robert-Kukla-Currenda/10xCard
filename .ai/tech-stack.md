@@ -3,7 +3,7 @@
 ## 1. Frontend
 - framework Blazor:
 - MudBlazor jako biblioteka componentów wizualnych
-- CSS zapewnia proste i szybkie stylowanie
+- Framework TailwindCSS zapewnia proste i szybkie stylowanie
 
 ## 2. Backend 
 - .NET 8 jako stabilna i łatwa platforma umożliwiająca budowanie wszechstronnych aplikacji.
