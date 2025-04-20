@@ -48,33 +48,8 @@ public class CardAIService : ICardAIService
         {
             // Generowanie fiszki przy użyciu AI
             var (front, back) = await GenerateCardContentAsync(command.OriginalContent);
-            //todo usunać zapis do bazy
-            // Tworzenie nowej fiszki
-            var card = new Card
-            {
-                UserId = userId,
-                OriginalContent = command.OriginalContent,
-                Front = front,
-                Back = back,
-                GeneratedBy = "AI",
-                CreatedAt = DateTime.UtcNow
-            };
 
-            // Zapis do bazy danych
-            _dbContext.Cards.Add(card);
-            await _dbContext.SaveChangesAsync();
-
-            // Mapowanie na DTO
-            return new CardDto
-            {
-                Id = card.Id,
-                UserId = card.UserId,
-                OriginalContent = card.OriginalContent,
-                Front = card.Front,
-                Back = card.Back,
-                GeneratedBy = card.GeneratedBy,
-                CreatedAt = card.CreatedAt
-            };
+            return new CardDto();            
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
