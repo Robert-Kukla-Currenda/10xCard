@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Infrastructure
+@using TenXCards.Frontend.Components
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Forms
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -8,14 +15,20 @@
     <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["TenXCards.Frontend.styles.css"]" />
-    <ImportMap />
+    <link rel="stylesheet" href="_content/MudBlazor/MudBlazor.min.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <HeadOutlet />
 </head>
 
 <body>
-    <Routes />
+    <CascadingAuthenticationState>
+        <MudThemeProvider />
+        <MudDialogProvider />
+        <MudSnackbarProvider />
+        <Routes />
+    </CascadingAuthenticationState>
     <script src="_framework/blazor.web.js"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 </body>
 
 </html>

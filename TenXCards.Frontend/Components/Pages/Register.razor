@@ -1,0 +1,120 @@
+@page "/register"
+@using MudBlazor
+@using TenXCards.API.Models
+@using System.ComponentModel.DataAnnotations
+@inject ISnackbar Snackbar
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<PageTitle>Rejestracja - TenXCards</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="pa-4">
+    <MudPaper Elevation="3" Class="pa-4">
+        <MudText Typo="Typo.h4" Class="mb-4" Align="Align.Center">Zarejestruj się</MudText>
+
+        <EditForm Model="@registerCommand" OnValidSubmit="@HandleRegistration" FormName="register">
+            <DataAnnotationsValidator />
+            <MudTextField T="string"
+            @bind-value="registerCommand.Email"
+            Label="Email"
+            Required="true"
+            RequiredError="Adres email jest wymagany."
+            InputType="InputType.Email"
+            Validation="@(new EmailAddressAttribute() { ErrorMessage = "Podany tekst nie jest prawidłowym adresem email." })"
+            MaxLength="255"
+            Class="mb-3" />
+
+            <MudTextField T="string"
+            @bind-value="registerCommand.FirstName" 
+            Label="Imię"
+            Required="true"
+            RequiredError="Imię jest wymagane."
+            MaxLength="100"
+            Class="mb-3" />
+
+            <MudTextField T="string"
+            @bind-value="registerCommand.LastName"
+            Label="Nazwisko"
+            Required="true"
+            RequiredError="Nazwisko jest wymagane."
+            MaxLength="100"
+            Class="mb-3" />
+
+            <MudTextField T="string"
+            @bind-value="registerCommand.Password"
+            Label="Hasło"
+            Required="true"
+            RequiredError="Hasło jest wymagane."
+            InputType="InputType.Password"
+            Validation="@(new RegularExpressionAttribute(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$") { ErrorMessage = "Hasło musi zawierać co najmniej jedną małą literę, jedną dużą literę i jedną cyfrę." })"
+            MaxLength="100"
+            MinLength="6"
+            Class="mb-4" />
+
+            <MudText Typo="Typo.caption" Color="Color.Error" Class="mb-4">
+                <ValidationSummary />
+            </MudText>
+
+            <MudButton ButtonType="ButtonType.Submit"
+            Variant="Variant.Filled"
+            Color="Color.Primary"
+            Size="Size.Large"
+            FullWidth="true"
+            Disabled="@isProcessing">
+                @if (isProcessing)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Przetwarzanie...</MudText>
+                }
+                else
+                {
+                    <MudText>Zarejestruj się</MudText>
+                }
+            </MudButton>
+        </EditForm>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private RegisterUserCommand registerCommand = new();
+    private bool isProcessing = false;
+
+    private void HandleRegistration(EditContext context)
+    {
+        if (isProcessing) return;
+        
+        try
+        {
+            isProcessing = true;
+            Thread.Sleep(2000); // Simulate a delay for processing
+            // var response = await Http.PostAsJsonAsync("api/users/register", registerCommand);
+            
+            // if (response.IsSuccessStatusCode)
+            // {
+            //     var user = await response.Content.ReadFromJsonAsync<UserDto>();
+            //     Snackbar.Add("Rejestracja zakończona pomyślnie!", Severity.Success);
+            //     NavigationManager.NavigateTo("/login");
+            // }
+            // else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            // {
+            //     Snackbar.Add("Użytkownik o podanym adresie email już istnieje.", Severity.Error);
+            // }
+            // else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            // {
+            //     Snackbar.Add("Wprowadzone dane są nieprawidłowe. Sprawdź formularz i spróbuj ponownie.", Severity.Error);
+            // }
+            // else
+            // {
+            //     Snackbar.Add("Wystąpił nieoczekiwany błąd. Spróbuj ponownie później.", Severity.Error);
+            // }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Wystąpił błąd podczas komunikacji z serwerem. Spróbuj ponownie później.", Severity.Error);
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+}
