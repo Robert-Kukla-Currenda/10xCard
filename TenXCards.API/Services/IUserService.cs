@@ -11,5 +11,7 @@ namespace TenXCards.API.Services
         /// <returns>Dane utworzonego użytkownika</returns>
         /// <exception cref="EmailAlreadyExistsException">Gdy użytkownik o podanym emailu już istnieje</exception>
         Task<UserDto> RegisterUserAsync(RegisterUserCommand command);
+
+        Task<LoginResultDto> Login(LoginUserCommand command);
     }
 }

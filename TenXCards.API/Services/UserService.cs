@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using TenXCards.API.Exceptions;
+using TenXCards.API.Jwt;
+using BC=BCrypt.Net.BCrypt;
 
 namespace TenXCards.API.Services
 {
@@ -12,11 +14,13 @@ namespace TenXCards.API.Services
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<UserService> _logger;
+        private readonly IJwtService _jwtService;
 
-        public UserService(ApplicationDbContext dbContext, ILogger<UserService> logger)
+        public UserService(ApplicationDbContext dbContext, ILogger<UserService> logger, IJwtService jwtService)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _jwtService = jwtService;
         }
 
         /// <inheritdoc/>
@@ -54,26 +58,36 @@ namespace TenXCards.API.Services
             return MapToDto(user);
         }
 
+        public async Task<LoginResultDto> Login(LoginUserCommand command)
+        {
+            var user = await _dbContext.Users
+                .FirstOrDefaultAsync(u => u.Email == command.Email);
+
+            if (user == null || !BC.Verify(command.Password, user.PasswordHash))
+            {
+                throw new UnauthorizedAccessException("Invalid credentials");
+            }
+
+            var token = _jwtService.GenerateToken(user);
+            
+            return new LoginResultDto
+            {
+                Token = token,
+                User = new UserDto
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    CreatedAt = user.CreatedAt
+                }
+            };
+        }
+
         // Metoda pomocnicza do hashowania hasła
         private string HashPassword(string password)
         {
-            // Generowanie losowej soli
-            byte[] salt = new byte[128 / 8];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(salt);
-            }
-
-            // Hashowanie hasła z solą
-            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: password,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA256,
-                iterationCount: 100000,
-                numBytesRequested: 256 / 8));
-
-            // Format: {algorytm}.{iteracje}.{salt}.{hash}
-            return $"PBKDF2.100000.{Convert.ToBase64String(salt)}.{hashed}";
+            return BC.HashPassword(password);
         }
 
         // Metoda mapująca encję na DTO

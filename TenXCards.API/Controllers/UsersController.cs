@@ -57,5 +57,29 @@ namespace TenXCards.API.Controllers
                 return StatusCode(500, new { error = "Wystąpił nieoczekiwany błąd podczas rejestracji." });
             }
         }
+
+
+        [HttpPost("login")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginResultDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<LoginResultDto>> Login([FromBody] LoginUserCommand command)
+        {
+            try
+            {
+                var result = await _userService.Login(command);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning("Failed login attempt for user {Email}", command.Email);
+                return Unauthorized(new { message = "Invalid credentials" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during login for user {Email}", command.Email);
+                return StatusCode(500, new { message = "An error occurred during login" });
+            }
+        }
     }
 }
