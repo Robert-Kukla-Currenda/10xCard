@@ -13,5 +13,12 @@ namespace TenXCards.API.Services
         Task<UserDto> RegisterUserAsync(RegisterUserCommand command);
 
         Task<LoginResultDto> Login(LoginUserCommand command);
+
+        /// <summary>
+        /// Retrieves a user by their ID
+        /// </summary>
+        /// <param name="id">The user's ID</param>
+        /// <returns>UserDto if found, null otherwise</returns>
+        Task<UserDto?> GetUserByIdAsync(int id);
     }
 }

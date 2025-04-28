@@ -84,6 +84,23 @@ namespace TenXCards.API.Services
             };
         }
 
+        public async Task<UserDto?> GetUserByIdAsync(int id)
+        {
+            try
+            {
+                var user = await _dbContext.Users
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.Id == id);
+
+                return user != null ? MapToDto(user) : null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user with ID {UserId}", id);
+                throw;
+            }
+        }
+
         // Metoda pomocnicza do hashowania hasła
         private string HashPassword(string password)
         {

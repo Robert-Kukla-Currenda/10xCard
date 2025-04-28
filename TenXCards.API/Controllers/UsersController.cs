@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TenXCards.API.Exceptions;
 using TenXCards.API.Models;
@@ -79,6 +81,36 @@ namespace TenXCards.API.Controllers
             {
                 _logger.LogError(ex, "Error during login for user {Email}", command.Email);
                 return StatusCode(500, new { message = "An error occurred during login" });
+            }
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDto))]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<UserDto>> GetCurrentUser()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out var id))
+                {
+                    return Unauthorized();
+                }
+
+                var user = await _userService.GetUserByIdAsync(id);
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving current user profile");
+                return StatusCode(500, new { error = "An unexpected error occurred" });
             }
         }
     }
