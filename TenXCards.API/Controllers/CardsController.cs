@@ -13,13 +13,41 @@ namespace TenXCards.API.Controllers;
 [Authorize]
 public class CardsController : ControllerBase
 {
-    private readonly ICardAIService _cardAIService;
+    private readonly ICardService _cardService;
     private readonly ILogger<CardsController> _logger;
 
-    public CardsController(ICardAIService cardAIService, ILogger<CardsController> logger)
+    public CardsController(ICardService cardService, ILogger<CardsController> logger)
     {
-        _cardAIService = cardAIService;
+        _cardService = cardService;
         _logger = logger;
+    }
+
+    [HttpPost]
+    [ProducesResponseType(typeof(CardDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> CreateCard([FromBody] SaveCardCommand command)
+    {
+        // Get user ID from claims
+        var userIdAsString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdAsString) || !int.TryParse(userIdAsString, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            var card = await _cardService.CreateCardAsync(command, userId);
+            return CreatedAtAction(
+                nameof(GetCard), 
+                new { id = card.Id }, 
+                card);
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 
     /// <summary>
@@ -45,7 +73,7 @@ public class CardsController : ControllerBase
                 ?? throw new UnauthorizedAccessException("User ID not found in claims"));
 
             // Generate card using AI service
-            var card = await _cardAIService.GenerateCardAsync(command, userId);
+            var card = await _cardService.GenerateCardAsync(command, userId);
 
             // Return created card
             return CreatedAtAction(nameof(GenerateCard), new { id = card.Id }, card);
@@ -65,5 +93,13 @@ public class CardsController : ControllerBase
             _logger.LogError(ex, "Unexpected error during card generation");
             return StatusCode(500, "An unexpected error occurred while generating the card");
         }
+    }
+
+    // Placeholder for GetCard action (needed for CreatedAtAction)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetCard(int id)
+    {
+        // Implementation will be added later
+        throw new NotImplementedException();
     }
 }

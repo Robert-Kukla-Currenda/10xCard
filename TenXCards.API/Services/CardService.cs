@@ -3,32 +3,69 @@ using System.Text.Json;
 using Microsoft.Extensions.Options;
 using TenXCards.API.Configuration;
 using TenXCards.API.Data;
+using TenXCards.API.Data.Models;
 using TenXCards.API.Exceptions;
 using TenXCards.API.Models;
 
 namespace TenXCards.API.Services;
 
-public class CardAIService : ICardAIService
+public class CardService : ICardService
 {
     private readonly HttpClient _httpClient;
     private readonly ApplicationDbContext _dbContext;
-    private readonly ILogger<CardAIService> _logger;
+    private readonly ILogger<CardService> _logger;
     private readonly AIServiceOptions _options;
 
-    public CardAIService(
+    public CardService(
         HttpClient httpClient,
         ApplicationDbContext dbContext,
-        ILogger<CardAIService> logger,
+        ILogger<CardService> logger,
         IOptions<AIServiceOptions> options)
     {
         _httpClient = httpClient;
         _dbContext = dbContext;
         _logger = logger;
         _options = options.Value;
-        
+
         // Konfiguracja HttpClient dla OpenRouter
-        _httpClient.BaseAddress = new Uri(_options.OpenRouterUrl);
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_options.OpenRouterApiKey}");
+        //_httpClient.BaseAddress = new Uri(_options.OpenRouterUrl);
+        //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_options.OpenRouterApiKey}");
+    }
+
+    public async Task<CardDto> CreateCardAsync(SaveCardCommand command, int userId)
+    {
+        try
+        {
+            var card = new Card
+            {
+                UserId = userId,
+                Front = command.Front,
+                Back = command.Back,
+                GeneratedBy = command.GeneratedBy,
+                OriginalContent = command.OriginalContent,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _dbContext.Cards.Add(card);
+            await _dbContext.SaveChangesAsync();
+
+            return new CardDto
+            {
+                Id = card.Id,
+                UserId = card.UserId,
+                Front = card.Front,
+                Back = card.Back,
+                GeneratedBy = card.GeneratedBy,
+                OriginalContent = card.OriginalContent,
+                CreatedAt = card.CreatedAt,
+                UpdatedAt = null
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating card for user {UserId}", userId);
+            throw new ApplicationException("Failed to create card", ex);
+        }
     }
 
     public async Task<CardDto> GenerateCardAsync(GenerateCardCommand command, int userId)
@@ -49,7 +86,7 @@ public class CardAIService : ICardAIService
             // Generowanie fiszki przy użyciu AI
             var (front, back) = await GenerateCardContentAsync(command.OriginalContent);
 
-            return new CardDto();            
+            return new CardDto();
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
@@ -85,12 +122,12 @@ Odpowiedź zwróć w formacie JSON:
         };
 
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_options.TimeoutSeconds));
-        
+
         var response = await _httpClient.PostAsJsonAsync("v1/chat/completions", request, cts.Token);
         response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadFromJsonAsync<AIResponse>();
-        
+
         if (result?.Choices == null || result.Choices.Length == 0)
         {
             throw new AIGenerationException("AI service returned no results");
@@ -104,8 +141,8 @@ Odpowiedź zwróć w formacie JSON:
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
             );
 
-            if (cardContent == null || 
-                string.IsNullOrEmpty(cardContent.Front) || 
+            if (cardContent == null ||
+                string.IsNullOrEmpty(cardContent.Front) ||
                 string.IsNullOrEmpty(cardContent.Back))
             {
                 throw new AIGenerationException("AI generated invalid card content");
@@ -121,18 +158,18 @@ Odpowiedź zwróć w formacie JSON:
 
     private record CardContent(string Front, string Back);
 
-    private class AIResponse
+private class AIResponse
+{
+    public Choice[] Choices { get; set; } = Array.Empty<Choice>();
+
+    public class Choice
     {
-        public Choice[] Choices { get; set; } = Array.Empty<Choice>();
-        
-        public class Choice
-        {
-            public Message Message { get; set; } = new();
-        }
-        
-        public class Message
-        {
-            public string Content { get; set; } = string.Empty;
-        }
+        public Message Message { get; set; } = new();
     }
+
+    public class Message
+    {
+        public string Content { get; set; } = string.Empty;
+    }
+}
 }

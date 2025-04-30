@@ -5,8 +5,10 @@ namespace TenXCards.API.Services;
 /// <summary>
 /// Service responsible for AI-based flashcard generation
 /// </summary>
-public interface ICardAIService
+public interface ICardService
 {
+    Task<CardDto> CreateCardAsync(SaveCardCommand command, int userId);
+
     /// <summary>
     /// Generates a flashcard using AI based on provided text input
     /// </summary>
