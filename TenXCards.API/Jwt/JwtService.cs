@@ -3,22 +3,23 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using TenXCards.API.Configuration;
 using TenXCards.API.Data.Models;
 
 namespace TenXCards.API.Jwt
 {
     public class JwtService : IJwtService
     {
-        private readonly JwtSettings _jwtSettings;
+        private readonly JwtOptions _jwtOptions;
 
-        public JwtService(IOptions<JwtSettings> jwtSettings)
+        public JwtService(IOptions<JwtOptions> jwtSettings)
         {
-            _jwtSettings = jwtSettings.Value;
+            _jwtOptions = jwtSettings.Value;
         }
 
         public string GenerateToken(User user)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
@@ -31,10 +32,10 @@ namespace TenXCards.API.Jwt
             };
 
             var token = new JwtSecurityToken(
-                issuer: _jwtSettings.Issuer,
-                audience: _jwtSettings.Audience,
+                issuer: _jwtOptions.Issuer,
+                audience: _jwtOptions.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
+                expires: DateTime.UtcNow.AddMinutes(_jwtOptions.ExpiryMinutes),
                 signingCredentials: credentials
             );
 

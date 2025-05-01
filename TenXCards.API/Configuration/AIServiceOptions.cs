@@ -2,7 +2,7 @@ namespace TenXCards.API.Configuration;
 
 public class AIServiceOptions
 {
-    public const string ConfigurationSection = "AIService";
+    public const string SectionName = "AIService";
     
     public required string OpenRouterApiKey { get; set; }
     public required string OpenRouterUrl { get; set; }

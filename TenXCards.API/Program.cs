@@ -15,10 +15,12 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
-builder.Services.Configure<JwtSettings>(
-    builder.Configuration.GetSection("JwtSettings"));
+builder.Services.Configure<JwtOptions>(
+    builder.Configuration.GetSection(JwtOptions.SectionName));
 builder.Services.Configure<CacheOptions>(
     builder.Configuration.GetSection(CacheOptions.SectionName));
+builder.Services.Configure<AIServiceOptions>(
+    builder.Configuration.GetSection(AIServiceOptions.SectionName));
 
 // Register necessary services
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -36,10 +38,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-            ValidAudience = builder.Configuration["JwtSettings:Audience"],
+            ValidIssuer = builder.Configuration[$"{JwtOptions.SectionName}:Issuer"],
+            ValidAudience = builder.Configuration[$"{JwtOptions.SectionName}:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]))
+                Encoding.UTF8.GetBytes(builder.Configuration[$"{JwtOptions.SectionName}:SecretKey"]))
         };
     });
 

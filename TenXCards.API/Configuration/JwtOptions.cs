@@ -1,7 +1,9 @@
-namespace TenXCards.API.Jwt
+namespace TenXCards.API.Configuration
 {
-    public class JwtSettings
+    public class JwtOptions
     {
+        public const string SectionName = "JWT";
+
         public string SecretKey { get; set; } = default!;
         public int ExpiryMinutes { get; set; }
         public string Issuer { get; set; } = default!;
