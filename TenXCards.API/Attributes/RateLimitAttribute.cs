@@ -24,13 +24,13 @@ namespace TenXCards.API.Attributes
         {
             var cache = context.HttpContext.RequestServices.GetRequiredService<IMemoryCache>();
             var options = context.HttpContext.RequestServices.GetRequiredService<IOptions<RateLimitOptions>>().Value;
-            var userId = context.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //var userId = context.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (string.IsNullOrEmpty(userId))
-            {
-                context.Result = new UnauthorizedResult();
-                return;
-            }
+            //if (string.IsNullOrEmpty(userId))
+            //{
+            //    context.Result = new UnauthorizedResult();
+            //    return;
+            //}
 
             var controllerName = context.RouteData.Values["controller"]?.ToString();
             var actionName = context.RouteData.Values["action"]?.ToString();
@@ -38,7 +38,7 @@ namespace TenXCards.API.Attributes
             var action = _action ?? actionName;
 
             var (windowInMinutes, maxRequests) = GetRateLimitValues(options, endpoint, action);
-            var key = $"rate_limit_{userId}_{endpoint}_{action}";
+            var key = $"rate_limit_{endpoint}_{action}";
 
             var counter = await cache.GetOrCreateAsync(key, entry =>
             {

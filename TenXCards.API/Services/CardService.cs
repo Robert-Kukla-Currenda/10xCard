@@ -14,6 +14,8 @@ namespace TenXCards.API.Services;
 
 public class CardService : ICardService
 {
+    private const string CACHE_CARD_PREFIX = "card_{userId}";
+
     private readonly HttpClient _httpClient;
     private readonly ApplicationDbContext _dbContext;
     private readonly ILogger<CardService> _logger;
@@ -62,7 +64,7 @@ public class CardService : ICardService
             await transaction.CommitAsync();
 
             // Invalidate cache for this user's card lists
-            InvalidateUserCardCache(userId);
+            InvalidateUserCardListCache(userId);
 
             return new CardDto
             {
@@ -97,10 +99,10 @@ public class CardService : ICardService
                 throw new ValidationException("Limit must be between 1 and 100");
 
             // Generate cache key based on query parameters
-            var cacheKey = GenerateCacheKey(query, userId);
+            var cacheKey = GenerateCacheKeyForGetList(query, userId);
 
             // Try to get from cache first
-            if (_cache.TryGetValue<PaginatedResult<CardDto>>(cacheKey, out var cachedResult))
+            if (_cache.TryGetValue<PaginatedResult<CardDto>>(cacheKey, out var cachedResult) && cachedResult != null)
             {
                 _logger.LogDebug("Cache hit for key: {CacheKey}", cacheKey);
                 return cachedResult;
@@ -138,7 +140,7 @@ public class CardService : ICardService
             // Try to get from cache first
             var cacheKey = $"card_{userId}_{cardId}";
 
-            if (_cache.TryGetValue<CardDto>(cacheKey, out var cachedCard))
+            if (_cache.TryGetValue<CardDto>(cacheKey, out var cachedCard) && cachedCard != null)
             {
                 _logger.LogDebug("Cache hit for card {CardId}", cardId);
                 return cachedCard;
@@ -197,8 +199,8 @@ public class CardService : ICardService
             await transaction.CommitAsync();
 
             // Invalidate cache for this card and user's card lists
-            InvalidateUserCardCache(userId);
-            _cache.Remove($"card_{userId}_{cardId}");
+            InvalidateUserCardListCache(userId);
+            InvalidateUserSingleCardCache(userId, cardId);
 
             return new CardDto
             {
@@ -240,8 +242,8 @@ public class CardService : ICardService
             await transaction.CommitAsync();
 
             // Invalidate cache for this card and user's card lists
-            InvalidateUserCardCache(userId);
-            _cache.Remove($"card_{userId}_{cardId}");
+            InvalidateUserCardListCache(userId);            
+            InvalidateUserSingleCardCache(userId, cardId);
 
             _logger.LogInformation("Card {CardId} deleted successfully by user {UserId}", cardId, userId);
         }
@@ -361,8 +363,9 @@ Odpowiedź zwróć w formacie JSON:
     #endregion
 
     #region Caching
-    private string GenerateCacheKey(GetCardsQuery query, int userId) =>
-        $"cards_list_{userId}_{query.Page}_{query.Limit}_{query.GeneratedBy}_{query.Sort}";
+    private string GenerateCacheKeyForGetList(GetCardsQuery query, int userId) =>
+        $"{CACHE_CARD_PREFIX}_list_{query.Page}_{query.Limit}_{query.GeneratedBy}_{query.Sort}"
+        .Replace("{userId}", $"{userId}");
 
     private async Task<PaginatedResult<CardDto>> GetCardsFromDatabase(GetCardsQuery query, int userId)
     {
@@ -410,21 +413,30 @@ Odpowiedź zwróć w formacie JSON:
         };
     }
 
-    private void InvalidateUserCardCache(int userId)
+    private void InvalidateUserCardListCache(int userId)
     {
-        // Remove all cached entries for this user
-        var cacheKey = $"cards_list_{userId}_*";
-        if (_cache is IEnumerable<KeyValuePair<object, object>> memCache)
-        {
-            var keysToRemove = memCache
-                .Where(kvp => kvp.Key.ToString()?.StartsWith(cacheKey) == true)
-                .Select(kvp => kvp.Key);
+        var memoryCacheKeys = ((MemoryCache)_cache).Keys;
+        var pattern = $"{CACHE_CARD_PREFIX}".Replace("{userId}", $"{userId}");
 
-            foreach (var key in keysToRemove)
+        var removedKeysCount = 0;
+        foreach (var key in memoryCacheKeys)
+        {
+            if (key != null && key.ToString()!.StartsWith(pattern))
             {
                 _cache.Remove(key);
+                removedKeysCount++;
             }
         }
+
+        _logger.LogDebug("Invalidated {Count} cache entries for user {UserId}", removedKeysCount, userId);
+    }
+
+    private void InvalidateUserSingleCardCache(int userId, int cardId)
+    {
+        var cacheKey = $"{CACHE_CARD_PREFIX}_{cardId}"
+            .Replace("{userId}", $"{userId}"); ;
+        _cache.Remove(cacheKey);
+        _logger.LogDebug("Invalidated cache entry for card {CardId} of user {UserId}", cardId, userId);
     }
     #endregion
 }
