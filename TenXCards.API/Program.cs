@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using TenXCards.API.Configuration;
 using TenXCards.API.Data;
 using TenXCards.API.Jwt;
 using TenXCards.API.Services;
@@ -16,6 +17,8 @@ builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("JwtSettings"));
+builder.Services.Configure<CacheOptions>(
+    builder.Configuration.GetSection(CacheOptions.SectionName));
 
 // Register necessary services
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

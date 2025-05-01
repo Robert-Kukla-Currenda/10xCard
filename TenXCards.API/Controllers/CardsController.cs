@@ -102,6 +102,35 @@ public class CardsController : ControllerBase
         }
     }
 
+    [HttpGet("{id:int}")]
+    [ProducesResponseType(typeof(CardDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<CardDto>> GetCard([FromRoute] int id)
+    {
+        try
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? throw new UnauthorizedAccessException("User ID not found in token"));
+
+            var card = await _cardService.GetCardByIdAsync(id, userId);
+            return Ok(card);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving card {CardId}", id);
+            return StatusCode(500, new { message = "An error occurred while retrieving the card" });
+        }
+    }
+
     /// <summary>
     /// Generates a new flashcard using AI based on provided text
     /// </summary>
@@ -145,13 +174,5 @@ public class CardsController : ControllerBase
             _logger.LogError(ex, "Unexpected error during card generation");
             return StatusCode(500, "An unexpected error occurred while generating the card");
         }
-    }
-
-    // Placeholder for GetCard action (needed for CreatedAtAction)
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetCard(int id)
-    {
-        // Implementation will be added later
-        throw new NotImplementedException();
     }
 }

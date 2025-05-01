@@ -128,6 +128,50 @@ public class CardService : ICardService
     }
     #endregion
 
+    #region Get Single Card
+    public async Task<CardDto> GetCardByIdAsync(int cardId, int userId)
+    {
+        try
+        {
+            // Try to get from cache first
+            var cacheKey = $"card_{userId}_{cardId}";
+
+            if (_cache.TryGetValue<CardDto>(cacheKey, out var cachedCard))
+            {
+                _logger.LogDebug("Cache hit for card {CardId}", cardId);
+                return cachedCard;
+            }
+
+            var card = await _dbContext.Cards
+                .Where(c => c.Id == cardId && c.UserId == userId)
+                .Select(c => new CardDto
+                {
+                    Id = c.Id,
+                    UserId = c.UserId,
+                    Front = c.Front,
+                    Back = c.Back,
+                    GeneratedBy = c.GeneratedBy,
+                    OriginalContent = c.OriginalContent,
+                    CreatedAt = c.CreatedAt,
+                    UpdatedAt = null
+                })
+                .FirstOrDefaultAsync();
+
+            if (card == null)
+            {
+                throw new KeyNotFoundException($"Card with ID {cardId} not found");
+            }
+
+            return card;
+        }
+        catch (Exception ex) when (ex is not KeyNotFoundException)
+        {
+            _logger.LogError(ex, "Error getting card {CardId} for user {UserId}", cardId, userId);
+            throw new ApplicationException("Failed to retrieve card", ex);
+        }
+    }
+    #endregion
+
     #region AI Card Generation
     public async Task<CardDto> GenerateCardAsync(GenerateCardCommand command, int userId)
     {
