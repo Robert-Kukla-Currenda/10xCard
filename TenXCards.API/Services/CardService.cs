@@ -219,6 +219,39 @@ public class CardService : ICardService
         }
     }
     #endregion
+    
+    #region Delete Card
+    public async Task DeleteCardAsync(int cardId, int userId)
+    {
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        try
+        {
+            var card = await _dbContext.Cards
+                .Where(c => c.Id == cardId && c.UserId == userId)
+                .FirstOrDefaultAsync();
+
+            if (card == null)
+            {
+                throw new KeyNotFoundException($"Card with ID {cardId} not found");
+            }
+
+            _dbContext.Cards.Remove(card);
+            await _dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            // Invalidate cache for this card and user's card lists
+            InvalidateUserCardCache(userId);
+            _cache.Remove($"card_{userId}_{cardId}");
+
+            _logger.LogInformation("Card {CardId} deleted successfully by user {UserId}", cardId, userId);
+        }
+        catch (Exception ex) when (ex is not KeyNotFoundException)
+        {
+            _logger.LogError(ex, "Error deleting card {CardId} for user {UserId}", cardId, userId);
+            throw new ApplicationException("Failed to delete card", ex);
+        }
+    }
+    #endregion
 
     #region AI Card Generation
     public async Task<CardDto> GenerateCardAsync(GenerateCardCommand command, int userId)

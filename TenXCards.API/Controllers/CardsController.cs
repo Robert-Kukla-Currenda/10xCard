@@ -158,6 +158,30 @@ public class CardsController : ControllerBase
         }
     }
 
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteCard(int id)
+    {
+        try
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            await _cardService.DeleteCardAsync(id, userId);
+
+            return Ok(new { message = "Card deleted successfully." });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting card {CardId}", id);
+            return StatusCode(500, new { message = "An error occurred while deleting the card." });
+        }
+    }
+
     /// <summary>
     /// Generates a new flashcard using AI based on provided text
     /// </summary>

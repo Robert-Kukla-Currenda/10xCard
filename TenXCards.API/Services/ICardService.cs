@@ -12,6 +12,7 @@ public interface ICardService
     Task<PaginatedResult<CardDto>> GetCardsAsync(GetCardsQuery query, int userId);
     Task<CardDto> GetCardByIdAsync(int cardId, int userId);
     Task<CardDto> UpdateCardAsync(int cardId, UpdateCardCommand command, int userId);
+    Task DeleteCardAsync(int cardId, int userId);
 
     /// <summary>
     /// Generates a flashcard using AI based on provided text input
