@@ -208,7 +208,7 @@ public class CardsController : ControllerBase
             var card = await _cardService.GenerateCardAsync(command, userId);
 
             // Return created card
-            return CreatedAtAction(nameof(GenerateCard), new { id = card.Id }, card);
+            return Ok(card);
         }
         catch (ValidationException ex)
         {
