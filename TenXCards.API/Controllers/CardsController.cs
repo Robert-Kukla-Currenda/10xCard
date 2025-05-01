@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TenXCards.API.Attributes;
 using TenXCards.API.Exceptions;
 using TenXCards.API.Models;
 using TenXCards.API.Services;
@@ -11,6 +12,7 @@ namespace TenXCards.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
+[RateLimit]
 public class CardsController : ControllerBase
 {
     private readonly ICardService _cardService;

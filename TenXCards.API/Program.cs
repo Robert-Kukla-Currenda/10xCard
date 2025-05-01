@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using TenXCards.API.Configuration;
 using TenXCards.API.Data;
 using TenXCards.API.Jwt;
+using TenXCards.API.Options;
 using TenXCards.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,11 +16,14 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
+
 builder.Services.Configure<JwtOptions>(
     builder.Configuration.GetSection(JwtOptions.SectionName));
+builder.Services.Configure<RateLimitOptions>(
+    builder.Configuration.GetSection(RateLimitOptions.SectionName));
 builder.Services.Configure<CacheOptions>(
     builder.Configuration.GetSection(CacheOptions.SectionName));
-builder.Services.Configure<AIServiceOptions>(
+builder.Services.Configure<AIServiceOptions>(    
     builder.Configuration.GetSection(AIServiceOptions.SectionName));
 
 // Register necessary services
