@@ -44,6 +44,7 @@ public class CardService : ICardService
     #region Save Card
     public async Task<CardDto> CreateCardAsync(SaveCardCommand command, int userId)
     {
+        var transaction = _dbContext.Database.BeginTransaction();
         try
         {
             var card = new Card
@@ -58,6 +59,7 @@ public class CardService : ICardService
 
             _dbContext.Cards.Add(card);
             await _dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
 
             // Invalidate cache for this user's card lists
             InvalidateUserCardCache(userId);
@@ -168,6 +170,52 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error getting card {CardId} for user {UserId}", cardId, userId);
             throw new ApplicationException("Failed to retrieve card", ex);
+        }
+    }
+    #endregion
+
+    #region Update Card
+    public async Task<CardDto> UpdateCardAsync(int cardId, UpdateCardCommand command, int userId)
+    {
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        try
+        {
+            var card = await _dbContext.Cards
+                .Where(c => c.Id == cardId && c.UserId == userId)
+                .FirstOrDefaultAsync();
+
+            if (card == null)
+            {
+                throw new KeyNotFoundException($"Card with ID {cardId} not found");
+            }
+
+            card.Front = command.Front;
+            card.Back = command.Back;
+            //card.UpdatedAt = DateTime.UtcNow;
+
+            await _dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            // Invalidate cache for this card and user's card lists
+            InvalidateUserCardCache(userId);
+            _cache.Remove($"card_{userId}_{cardId}");
+
+            return new CardDto
+            {
+                Id = card.Id,
+                UserId = card.UserId,
+                Front = card.Front,
+                Back = card.Back,
+                GeneratedBy = card.GeneratedBy,
+                OriginalContent = card.OriginalContent,
+                CreatedAt = card.CreatedAt,
+                //UpdatedAt = card.UpdatedAt
+            };
+        }
+        catch (Exception ex) when (ex is not KeyNotFoundException)
+        {
+            _logger.LogError(ex, "Error updating card {CardId} for user {UserId}", cardId, userId);
+            throw new ApplicationException("Failed to update card", ex);
         }
     }
     #endregion

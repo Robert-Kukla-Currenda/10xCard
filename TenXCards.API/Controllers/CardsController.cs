@@ -131,6 +131,31 @@ public class CardsController : ControllerBase
         }
     }
 
+    [HttpPut("{id}")]
+    [ProducesResponseType(typeof(CardDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateCard([FromRoute] int id, [FromBody] UpdateCardCommand command)
+    {
+        try
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var updatedCard = await _cardService.UpdateCardAsync(id, command, userId);
+            return Ok(updatedCard);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning(ex, "Card {CardId} not found", id);
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating card {CardId}", id);
+            return StatusCode(500, new { message = "An error occurred while updating the card" });
+        }
+    }
+
     /// <summary>
     /// Generates a new flashcard using AI based on provided text
     /// </summary>
