@@ -1,3 +1,4 @@
+using TenXCards.API.Controllers;
 using TenXCards.API.Models;
 
 namespace TenXCards.API.Services;
@@ -8,6 +9,8 @@ namespace TenXCards.API.Services;
 public interface ICardService
 {
     Task<CardDto> CreateCardAsync(SaveCardCommand command, int userId);
+
+    Task<PaginatedResult<CardDto>> GetCardsAsync(GetCardsQuery query, int userId);
 
     /// <summary>
     /// Generates a flashcard using AI based on provided text input

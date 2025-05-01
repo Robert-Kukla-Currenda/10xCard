@@ -40,13 +40,65 @@ public class CardsController : ControllerBase
         {
             var card = await _cardService.CreateCardAsync(command, userId);
             return CreatedAtAction(
-                nameof(GetCard), 
-                new { id = card.Id }, 
+                nameof(GetCard),
+                new { id = card.Id },
                 card);
         }
         catch (ValidationException ex)
         {
             return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Gets a paginated list of cards for the authenticated user.
+    /// </summary>
+    /// <param name="page">Page number (starts from 1)</param>
+    /// <param name="limit">Number of items per page (1-100)</param>
+    /// <param name="generatedBy">Filter by generation type (AI or human)</param>
+    /// <param name="sort">Sort order (created_at_desc, created_at_asc)</param>
+    /// <returns>A paginated list of cards</returns>
+    [HttpGet]
+    [ProducesResponseType(typeof(PaginatedResult<CardDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetCards(
+        [FromQuery] int page = 1,
+        [FromQuery] int limit = 20,
+        [FromQuery] string? generatedBy = null,
+        [FromQuery] string? sort = null)
+    {
+        try
+        {
+            // Get user ID from claims
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+            {
+                _logger.LogWarning("User ID claim missing or invalid");
+                return Unauthorized();
+            }
+
+            var query = new GetCardsQuery
+            {
+                Page = page,
+                Limit = limit,
+                GeneratedBy = generatedBy,
+                Sort = sort
+            };
+
+            var result = await _cardService.GetCardsAsync(query, userId);
+            return Ok(result);
+        }
+        catch (ValidationException ex)
+        {
+            _logger.LogWarning(ex, "Validation error in GetCards");
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting cards for user");
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { error = "An error occurred while processing your request." });
         }
     }
 
@@ -69,7 +121,7 @@ public class CardsController : ControllerBase
         try
         {
             // Get user ID from claims
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value 
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                 ?? throw new UnauthorizedAccessException("User ID not found in claims"));
 
             // Generate card using AI service

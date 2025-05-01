@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using TenXCards.API.Configuration;
+using TenXCards.API.Controllers;
 using TenXCards.API.Data;
 using TenXCards.API.Data.Models;
 using TenXCards.API.Exceptions;
@@ -65,6 +67,70 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error creating card for user {UserId}", userId);
             throw new ApplicationException("Failed to create card", ex);
+        }
+    }
+
+    public async Task<PaginatedResult<CardDto>> GetCardsAsync(GetCardsQuery query, int userId)
+    {
+        try
+        {
+            // Validate page and limit
+            if (query.Page < 1)
+                throw new ValidationException("Page must be greater than 0");
+
+            if (query.Limit < 1 || query.Limit > 100)
+                throw new ValidationException("Limit must be between 1 and 100");
+
+            // Build the query
+            var cardsQuery = _dbContext.Cards
+                .Where(c => c.UserId == userId);
+
+            // Apply filters
+            if (!string.IsNullOrWhiteSpace(query.GeneratedBy))
+            {
+                cardsQuery = cardsQuery.Where(c => c.GeneratedBy == query.GeneratedBy);
+            }
+
+            // Apply sorting
+            cardsQuery = query.Sort?.ToLower() switch
+            {
+                "created_at_desc" => cardsQuery.OrderByDescending(c => c.CreatedAt),
+                "created_at_asc" => cardsQuery.OrderBy(c => c.CreatedAt),
+                _ => cardsQuery.OrderByDescending(c => c.CreatedAt) // default sorting
+            };
+
+            // Get total count
+            var total = await cardsQuery.CountAsync();
+
+            // Apply pagination
+            var cards = await cardsQuery
+                .Skip((query.Page - 1) * query.Limit)
+                .Take(query.Limit)
+                .Select(c => new CardDto
+                {
+                    Id = c.Id,
+                    UserId = c.UserId,
+                    Front = c.Front,
+                    Back = c.Back,
+                    GeneratedBy = c.GeneratedBy,
+                    OriginalContent = c.OriginalContent,
+                    CreatedAt = c.CreatedAt,
+                    //UpdatedAt = c.UpdatedAt
+                })
+                .ToListAsync();
+
+            return new PaginatedResult<CardDto>
+            {
+                Items = cards,
+                Page = query.Page,
+                Limit = query.Limit,
+                Total = total
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting cards for user {UserId}", userId);
+            throw new ApplicationException("Failed to get cards", ex);
         }
     }
 
@@ -158,18 +224,18 @@ Odpowiedź zwróć w formacie JSON:
 
     private record CardContent(string Front, string Back);
 
-private class AIResponse
-{
-    public Choice[] Choices { get; set; } = Array.Empty<Choice>();
-
-    public class Choice
+    private class AIResponse
     {
-        public Message Message { get; set; } = new();
-    }
+        public Choice[] Choices { get; set; } = Array.Empty<Choice>();
 
-    public class Message
-    {
-        public string Content { get; set; } = string.Empty;
+        public class Choice
+        {
+            public Message Message { get; set; } = new();
+        }
+
+        public class Message
+        {
+            public string Content { get; set; } = string.Empty;
+        }
     }
-}
 }
