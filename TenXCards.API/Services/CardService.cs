@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using TenXCards.API.Configuration;
 using TenXCards.API.Controllers;
@@ -17,23 +18,30 @@ public class CardService : ICardService
     private readonly ApplicationDbContext _dbContext;
     private readonly ILogger<CardService> _logger;
     private readonly AIServiceOptions _options;
+    private readonly IMemoryCache _cache;
+    private readonly IOptions<CacheOptions> _cacheOptions;
 
     public CardService(
         HttpClient httpClient,
         ApplicationDbContext dbContext,
         ILogger<CardService> logger,
-        IOptions<AIServiceOptions> options)
+        IOptions<AIServiceOptions> options,
+        IMemoryCache cache,
+        IOptions<CacheOptions> cacheOptions)
     {
         _httpClient = httpClient;
         _dbContext = dbContext;
         _logger = logger;
         _options = options.Value;
+        _cache = cache;
+        _cacheOptions = cacheOptions;
 
         // Konfiguracja HttpClient dla OpenRouter
         //_httpClient.BaseAddress = new Uri(_options.OpenRouterUrl);
         //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_options.OpenRouterApiKey}");
     }
 
+    #region Save Card
     public async Task<CardDto> CreateCardAsync(SaveCardCommand command, int userId)
     {
         try
@@ -50,6 +58,9 @@ public class CardService : ICardService
 
             _dbContext.Cards.Add(card);
             await _dbContext.SaveChangesAsync();
+
+            // Invalidate cache for this user's card lists
+            InvalidateUserCardCache(userId);
 
             return new CardDto
             {
@@ -69,7 +80,9 @@ public class CardService : ICardService
             throw new ApplicationException("Failed to create card", ex);
         }
     }
+    #endregion
 
+    #region Get Cards
     public async Task<PaginatedResult<CardDto>> GetCardsAsync(GetCardsQuery query, int userId)
     {
         try
@@ -81,59 +94,41 @@ public class CardService : ICardService
             if (query.Limit < 1 || query.Limit > 100)
                 throw new ValidationException("Limit must be between 1 and 100");
 
-            // Build the query
-            var cardsQuery = _dbContext.Cards
-                .Where(c => c.UserId == userId);
+            // Generate cache key based on query parameters
+            var cacheKey = GenerateCacheKey(query, userId);
 
-            // Apply filters
-            if (!string.IsNullOrWhiteSpace(query.GeneratedBy))
+            // Try to get from cache first
+            if (_cache.TryGetValue<PaginatedResult<CardDto>>(cacheKey, out var cachedResult))
             {
-                cardsQuery = cardsQuery.Where(c => c.GeneratedBy == query.GeneratedBy);
+                _logger.LogDebug("Cache hit for key: {CacheKey}", cacheKey);
+                return cachedResult;
             }
 
-            // Apply sorting
-            cardsQuery = query.Sort?.ToLower() switch
+            // If not in cache, get from database
+            var result = await GetCardsFromDatabase(query, userId);
+
+            // Cache the result if it's not too large
+            if (result.Total <= _cacheOptions.Value.MaxCardListItems)
             {
-                "created_at_desc" => cardsQuery.OrderByDescending(c => c.CreatedAt),
-                "created_at_asc" => cardsQuery.OrderBy(c => c.CreatedAt),
-                _ => cardsQuery.OrderByDescending(c => c.CreatedAt) // default sorting
-            };
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(_cacheOptions.Value.CardListExpirationMinutes))
+                    .SetSize(1); // Each entry counts as 1 unit
 
-            // Get total count
-            var total = await cardsQuery.CountAsync();
+                _cache.Set(cacheKey, result, cacheEntryOptions);
+                _logger.LogDebug("Cached results for key: {CacheKey}", cacheKey);
+            }
 
-            // Apply pagination
-            var cards = await cardsQuery
-                .Skip((query.Page - 1) * query.Limit)
-                .Take(query.Limit)
-                .Select(c => new CardDto
-                {
-                    Id = c.Id,
-                    UserId = c.UserId,
-                    Front = c.Front,
-                    Back = c.Back,
-                    GeneratedBy = c.GeneratedBy,
-                    OriginalContent = c.OriginalContent,
-                    CreatedAt = c.CreatedAt,
-                    //UpdatedAt = c.UpdatedAt
-                })
-                .ToListAsync();
-
-            return new PaginatedResult<CardDto>
-            {
-                Items = cards,
-                Page = query.Page,
-                Limit = query.Limit,
-                Total = total
-            };
+            return result;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting cards for user {UserId}", userId);
-            throw new ApplicationException("Failed to get cards", ex);
+            throw;
         }
     }
+    #endregion
 
+    #region AI Card Generation
     public async Task<CardDto> GenerateCardAsync(GenerateCardCommand command, int userId)
     {
         // Walidacja wejścia
@@ -238,4 +233,73 @@ Odpowiedź zwróć w formacie JSON:
             public string Content { get; set; } = string.Empty;
         }
     }
+    #endregion
+
+    #region Caching
+    private string GenerateCacheKey(GetCardsQuery query, int userId) =>
+        $"cards_list_{userId}_{query.Page}_{query.Limit}_{query.GeneratedBy}_{query.Sort}";
+
+    private async Task<PaginatedResult<CardDto>> GetCardsFromDatabase(GetCardsQuery query, int userId)
+    {
+        var cardsQuery = _dbContext.Cards
+            .Where(c => c.UserId == userId);
+
+        // Apply filters
+        if (!string.IsNullOrWhiteSpace(query.GeneratedBy))
+        {
+            cardsQuery = cardsQuery.Where(c => c.GeneratedBy == query.GeneratedBy);
+        }
+
+        // Apply sorting
+        cardsQuery = query.Sort?.ToLower() switch
+        {
+            "created_at_desc" => cardsQuery.OrderByDescending(c => c.CreatedAt),
+            "created_at_asc" => cardsQuery.OrderBy(c => c.CreatedAt),
+            _ => cardsQuery.OrderByDescending(c => c.CreatedAt)
+        };
+
+        var total = await cardsQuery.CountAsync();
+
+        var cards = await cardsQuery
+            .Skip((query.Page - 1) * query.Limit)
+            .Take(query.Limit)
+            .Select(c => new CardDto
+            {
+                Id = c.Id,
+                UserId = c.UserId,
+                Front = c.Front,
+                Back = c.Back,
+                GeneratedBy = c.GeneratedBy,
+                OriginalContent = c.OriginalContent,
+                CreatedAt = c.CreatedAt,
+                //UpdatedAt = c.UpdatedAt
+            })
+            .ToListAsync();
+
+        return new PaginatedResult<CardDto>
+        {
+            Items = cards,
+            Page = query.Page,
+            Limit = query.Limit,
+            Total = total
+        };
+    }
+
+    private void InvalidateUserCardCache(int userId)
+    {
+        // Remove all cached entries for this user
+        var cacheKey = $"cards_list_{userId}_*";
+        if (_cache is IEnumerable<KeyValuePair<object, object>> memCache)
+        {
+            var keysToRemove = memCache
+                .Where(kvp => kvp.Key.ToString()?.StartsWith(cacheKey) == true)
+                .Select(kvp => kvp.Key);
+
+            foreach (var key in keysToRemove)
+            {
+                _cache.Remove(key);
+            }
+        }
+    }
+    #endregion
 }
