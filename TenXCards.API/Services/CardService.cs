@@ -9,6 +9,7 @@ using TenXCards.API.Data;
 using TenXCards.API.Data.Models;
 using TenXCards.API.Exceptions;
 using TenXCards.API.Models;
+using TenXCards.API.Models.OpenRouter;
 
 namespace TenXCards.API.Services;
 
@@ -22,6 +23,7 @@ public class CardService : ICardService
     private readonly AIServiceOptions _options;
     private readonly IMemoryCache _cache;
     private readonly IOptions<CacheOptions> _cacheOptions;
+    private readonly IOpenRouterService _openRouterService;
 
     public CardService(
         HttpClient httpClient,
@@ -29,7 +31,8 @@ public class CardService : ICardService
         ILogger<CardService> logger,
         IOptions<AIServiceOptions> options,
         IMemoryCache cache,
-        IOptions<CacheOptions> cacheOptions)
+        IOptions<CacheOptions> cacheOptions,
+        IOpenRouterService openRouterService)
     {
         _httpClient = httpClient;
         _dbContext = dbContext;
@@ -37,6 +40,7 @@ public class CardService : ICardService
         _options = options.Value;
         _cache = cache;
         _cacheOptions = cacheOptions;
+        _openRouterService = openRouterService;
 
         // Konfiguracja HttpClient dla OpenRouter
         //_httpClient.BaseAddress = new Uri(_options.OpenRouterUrl);
@@ -271,10 +275,12 @@ public class CardService : ICardService
 
         try
         {
-            // Generowanie fiszki przy użyciu AI
-            var (front, back) = await GenerateCardContentAsync(command.OriginalContent);
+            var x = await _openRouterService.SendMessageAsync(command.OriginalContent, MessageRole.User);
 
-            return new CardDto();
+            // Generowanie fiszki przy użyciu AI
+            //var (front, back) = await GenerateCardContentAsync(command.OriginalContent);
+
+            return new CardDto() { Back = x };
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
@@ -301,7 +307,7 @@ Odpowiedź zwróć w formacie JSON:
 
         var request = new
         {
-            model = _options.ModelName,
+            model = _options.OpenRouterModelName,
             messages = new[]
             {
                 new { role = "system", content = "Jesteś ekspertem w tworzeniu fiszek edukacyjnych." },
