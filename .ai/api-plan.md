@@ -90,7 +90,97 @@
 - **Success Codes:** 200 OK  
 - **Error Codes:** 401 Unauthorized
 
-### 2.2. Cards
+### 2.2. Original Contents
+
+#### Create Original Content
+- **Method:** POST  
+- **URL:** `/original-contents`  
+- **Description:** Save new original content that will be used to generate flashcards.  
+- **Headers:** `Authorization: Bearer JWT_TOKEN_HERE`  
+- **Request Payload:**
+    ```json
+    {
+      "content": "Long text content that will be used to generate flashcards..."
+    }
+    ```
+- **Field Validations:**
+    - `content`: Required, must be between 1000 and 10000 characters
+- **Response:**
+    ```json
+    {
+      "id": 1,
+      "user_id": 1,
+      "content": "Long text content that will be used to generate flashcards...",
+      "created_at": "2025-04-19T12:00:00Z"
+    }
+    ```
+- **Success Codes:** 201 Created  
+- **Error Codes:** 
+    - 400 Bad Request (validation errors)
+    - 401 Unauthorized
+
+#### Get Original Contents List
+- **Method:** GET  
+- **URL:** `/original-contents`  
+- **Description:** Retrieves a paginated list of user's original contents.  
+- **Headers:** `Authorization: Bearer JWT_TOKEN_HERE`  
+- **Query Parameters:**
+    - `page` (optional, default: 1)
+    - `limit` (optional, default: 20)
+    - `sort` (optional, e.g., `created_at_desc`)
+- **Response:**
+    ```json
+    {
+      "items": [
+        {
+          "id": 1,
+          "user_id": 1,
+          "content": "Long text content...",
+          "created_at": "2025-04-19T12:00:00Z"
+        }
+      ],
+      "pagination": {
+        "page": 1,
+        "limit": 20,
+        "total": 35
+      }
+    }
+    ```
+- **Success Codes:** 200 OK  
+- **Error Codes:** 401 Unauthorized
+
+#### Get Single Original Content
+- **Method:** GET  
+- **URL:** `/original-contents/{id}`  
+- **Description:** Retrieves a specific original content by its ID.  
+- **Headers:** `Authorization: Bearer JWT_TOKEN_HERE`  
+- **Response:**
+    ```json
+    {
+      "id": 1,
+      "user_id": 1,
+      "content": "Long text content...",
+      "created_at": "2025-04-19T12:00:00Z"
+    }
+    ```
+- **Success Codes:** 200 OK  
+- **Error Codes:** 401 Unauthorized, 404 Not Found
+
+#### Delete Original Content
+- **Method:** DELETE  
+- **URL:** `/original-contents/{id}`  
+- **Description:** Deletes the specified original content and all associated cards.  
+- **Headers:** `Authorization: Bearer JWT_TOKEN_HERE`  
+- **Response:**
+    ```json
+    {
+      "message": "Original content and associated cards deleted successfully."
+    }
+    ```
+- **Success Codes:** 200 OK  
+- **Error Codes:** 401 Unauthorized, 404 Not Found
+
+### 2.3. Cards
 
 #### Create Card
 - **Method:** POST  
