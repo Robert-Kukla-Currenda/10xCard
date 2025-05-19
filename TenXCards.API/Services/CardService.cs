@@ -50,7 +50,7 @@ public class CardService : ICardService
     #region Save Card
     public async Task<CardDto> CreateCardAsync(SaveCardCommand command, int userId)
     {
-        var transaction = _dbContext.Database.BeginTransaction();
+        /*var transaction = _dbContext.Database.BeginTransaction();
         try
         {
             var card = new Card
@@ -86,12 +86,13 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error creating card for user {UserId}", userId);
             throw new ApplicationException("Failed to create card", ex);
-        }
+        }*/
+        return null;
     }
     #endregion
 
     #region Get Cards
-    public async Task<PaginatedResult<CardDto>> GetCardsAsync(GetCardsQuery query, int userId)
+    public async Task<PaginatedResult<CardDto>> GetCardsAsync(GetPagedListQuery query, int userId)
     {
         try
         {
@@ -139,6 +140,7 @@ public class CardService : ICardService
     #region Get Single Card
     public async Task<CardDto> GetCardByIdAsync(int cardId, int userId)
     {
+        /*
         try
         {
             // Try to get from cache first
@@ -176,13 +178,15 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error getting card {CardId} for user {UserId}", cardId, userId);
             throw new ApplicationException("Failed to retrieve card", ex);
-        }
+        }*/
+        return null;
     }
     #endregion
 
     #region Update Card
     public async Task<CardDto> UpdateCardAsync(int cardId, UpdateCardCommand command, int userId)
     {
+        /*
         using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try
         {
@@ -223,6 +227,8 @@ public class CardService : ICardService
             _logger.LogError(ex, "Error updating card {CardId} for user {UserId}", cardId, userId);
             throw new ApplicationException("Failed to update card", ex);
         }
+        */
+        return null;
     }
     #endregion
     
@@ -369,12 +375,13 @@ Odpowiedź zwróć w formacie JSON:
     #endregion
 
     #region Caching
-    private string GenerateCacheKeyForGetList(GetCardsQuery query, int userId) =>
+    private string GenerateCacheKeyForGetList(GetPagedListQuery query, int userId) =>
         $"{CACHE_CARD_PREFIX}_list_{query.Page}_{query.Limit}_{query.GeneratedBy}_{query.Sort}"
         .Replace("{userId}", $"{userId}");
 
-    private async Task<PaginatedResult<CardDto>> GetCardsFromDatabase(GetCardsQuery query, int userId)
+    private async Task<PaginatedResult<CardDto>> GetCardsFromDatabase(GetPagedListQuery query, int userId)
     {
+        /*
         var cardsQuery = _dbContext.Cards
             .Where(c => c.UserId == userId);
 
@@ -417,6 +424,8 @@ Odpowiedź zwróć w formacie JSON:
             Limit = query.Limit,
             Total = total
         };
+        */
+        return null;
     }
 
     private void InvalidateUserCardListCache(int userId)

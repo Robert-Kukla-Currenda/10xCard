@@ -47,6 +47,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MainDatabase")));
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IOriginalContentService, OriginalContentService>();
 builder.Services.AddScoped<ICardService, CardService>();
 builder.Services.AddScoped<IOpenRouterService, OpenRouterService>();
 builder.Services.AddScoped<IErrorLoggingService, ErrorLoggingService>();

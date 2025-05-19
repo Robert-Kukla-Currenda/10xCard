@@ -80,7 +80,7 @@ public class CardsController : ControllerBase
                 return Unauthorized();
             }
 
-            var query = new GetCardsQuery
+            var query = new GetPagedListQuery
             {
                 Page = page,
                 Limit = limit,

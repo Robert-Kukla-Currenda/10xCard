@@ -9,7 +9,7 @@ namespace TenXCards.API.Services;
 public interface ICardService
 {
     Task<CardDto> CreateCardAsync(SaveCardCommand command, int userId);
-    Task<PaginatedResult<CardDto>> GetCardsAsync(GetCardsQuery query, int userId);
+    Task<PaginatedResult<CardDto>> GetCardsAsync(GetPagedListQuery query, int userId);
     Task<CardDto> GetCardByIdAsync(int cardId, int userId);
     Task<CardDto> UpdateCardAsync(int cardId, UpdateCardCommand command, int userId);
     Task DeleteCardAsync(int cardId, int userId);
