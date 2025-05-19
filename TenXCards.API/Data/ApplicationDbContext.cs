@@ -13,6 +13,7 @@ public partial class ApplicationDbContext : DbContext
     public DbSet<User> Users { get; set; } = default!;
     public DbSet<Card> Cards { get; set; } = default!;
     public DbSet<ErrorLog> ErrorLogs { get; set; } = default!;
+    public DbSet<OriginalContent> OriginalContents { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -32,6 +33,9 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<Card>()
             .HasIndex(c => c.GeneratedBy);
 
+        modelBuilder.Entity<OriginalContent>()
+            .HasIndex(o => o.UserId);
+
         // Configure relationships
         modelBuilder.Entity<Card>()
             .HasOne(c => c.User)
@@ -45,8 +49,23 @@ public partial class ApplicationDbContext : DbContext
             .HasForeignKey(e => e.CardId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Configure check constraints
+        modelBuilder.Entity<OriginalContent>()
+            .HasOne(o => o.User)
+            .WithMany(u => u.OriginalContents)
+            .HasForeignKey(o => o.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Configure check constraints using new syntax
         modelBuilder.Entity<Card>()
-            .HasCheckConstraint("CK_Card_GeneratedBy", "\"GeneratedBy\" IN ('AI', 'human')");
+            .ToTable(tb => tb.HasCheckConstraint(
+                "CK_Card_GeneratedBy", 
+                "\"GeneratedBy\" IN ('AI', 'human')"
+            ));
+
+        modelBuilder.Entity<OriginalContent>()
+            .ToTable(tb => tb.HasCheckConstraint(
+                "CK_OriginalContent_ContentLength",
+                "char_length(\"Content\") BETWEEN 1000 AND 10000"
+            ));
     }    
 }

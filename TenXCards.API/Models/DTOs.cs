@@ -46,20 +46,43 @@ namespace TenXCards.API.Models
     /// </summary>
     public class CardDto
     {
+        public int Id { get; set; }        
+
+        [MinLength(1)]
+        [MaxLength(1000)]
+        public string Front { get; set; } = default!;
+
+        [MinLength(1)]
+        [MaxLength(5000)]
+        public string Back { get; set; } = default!;
+
+        [StringLength(10)]
+        public string GeneratedBy { get; set; } = default!;
+
+        public DateTime CreatedAt { get; set; }
+
+        // Navigation properties
+        public UserDto? User { get; set; }
+        public OriginalContentDto? OriginalContent { get; set; }        
+    }
+
+    // -----------------------------------------
+    // Original Content DTO
+    // -----------------------------------------
+
+    /// <summary>
+    /// Represents the original content associated with a user.
+    /// Derived from the OriginalContent entity.
+    /// </summary>
+    public class OriginalContentDto
+    {
         public int Id { get; set; }
         public int UserId { get; set; }
-        
-        public string OriginalContent { get; set; } = default!;        
-        public string Front { get; set; } = default!;
-        public string Back { get; set; } = default!;
-        
-        // Expected values: "AI" or "human"
-        public string GeneratedBy { get; set; } = default!;
-        
+
+        [StringLength(10000, MinimumLength = 1000)]
+        public string Content { get; set; } = default!;
+
         public DateTime CreatedAt { get; set; }
-        
-        // Included for update scenarios; may be null if never updated.
-        public DateTime? UpdatedAt { get; set; }
     }
 
     // -----------------------------------------

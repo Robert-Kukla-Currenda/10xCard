@@ -29,6 +29,7 @@ public class User
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    // Navigation property
+    // Navigation properties
     public virtual ICollection<Card> Cards { get; set; } = new List<Card>();
+    public virtual ICollection<OriginalContent> OriginalContents { get; set; } = new List<OriginalContent>();
 }

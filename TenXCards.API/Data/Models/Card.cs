@@ -13,9 +13,7 @@ public class Card
     public int UserId { get; set; }
 
     [Required]
-    [MinLength(1000)]
-    [MaxLength(10000)]
-    public string OriginalContent { get; set; } = default!;
+    public int OriginalContentId { get; set; }
 
     [Required]
     [MinLength(1)]
@@ -37,6 +35,9 @@ public class Card
     // Navigation properties
     [ForeignKey(nameof(UserId))]
     public virtual User User { get; set; } = default!;
-    
+
+    [ForeignKey(nameof(OriginalContentId))]
+    public virtual OriginalContent OriginalContent { get; set; } = default!;
+
     public virtual ICollection<ErrorLog> ErrorLogs { get; set; } = new List<ErrorLog>();
 }

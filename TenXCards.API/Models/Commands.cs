@@ -47,6 +47,20 @@ namespace TenXCards.API.Models
     }
 
     // -----------------------------------------
+    // Original Content Commands
+    // -----------------------------------------
+
+    /// <summary>
+    /// Command for creating original content that will be used to generate flashcards.
+    /// </summary>
+    public class CreateOriginalContentCommand
+    {
+        [Required]
+        [StringLength(10000, MinimumLength = 1000, ErrorMessage = "Content must be between 1000 and 10000 characters")]
+        public string Content { get; set; } = default!;
+    }
+
+    // -----------------------------------------
     // Card Commands
     // -----------------------------------------
 
@@ -56,21 +70,22 @@ namespace TenXCards.API.Models
     public class SaveCardCommand
     {
         [Required]
-        [StringLength(1000, MinimumLength = 1)]
+        public int OriginalContentId { get; set; }
+
+        [Required]
+        [MinLength(1)]
+        [MaxLength(1000)]
         public string Front { get; set; } = default!;
 
         [Required]
-        [StringLength(5000, MinimumLength = 1)]
+        [MinLength(1)]
+        [MaxLength(5000)]
         public string Back { get; set; } = default!;
 
         // Possible values: "AI" or "human"
         [Required]
         [StringLength(10)]
-        public required string GeneratedBy { get; set; }
-
-        // Field for original content
-        [StringLength(10000, MinimumLength = 1000)]
-        public string OriginalContent { get; set; } = default!;
+        public required string GeneratedBy { get; set; } = default!;
     }
 
     /// <summary>
