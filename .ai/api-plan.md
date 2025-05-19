@@ -8,7 +8,7 @@
 - **Cards**  
   Represents flashcards created for learning. Maps to the `cards` table.  
   *Validation:*  
-  - `original_content` length must be between 1000 and 10000 characters.  
+  - `original_content_id`: Required.
   - `front` text length: 1–1000 characters.  
   - `back` text length: 1–5000 characters.  
   - `generated_by` value must be either `"AI"` or `"human"`.
@@ -193,14 +193,14 @@
       "front": "Question text...",
       "back": "Answer text...",
       "generated_by": "human",
-      "original_content": "original text content...",      
+      "original_content_id": "1"      
     }
     ```
 - **Field Validations:**
     - `front`: Required, 1-1000 characters
     - `back`: Required, 1-5000 characters
     - `generated_by`: Required, must be either "AI" or "human"
-    - `original_content`: Optional for manual cards, required for AI-generated (1000-10000 characters)    
+    - `original_content_id`: Optional for manual cards, required for AI-generated cards    
 - **Response:**
     ```json
     {
@@ -209,7 +209,7 @@
       "front": "Question text...",
       "back": "Answer text...",
       "generated_by": "human",
-      "original_content": "Optional original text content...",
+      "original_content_id": "1",
       "created_at": "2025-04-19T12:05:00Z",
       "updated_at": null
     }
@@ -223,12 +223,12 @@
 #### Generate Card using AI
 - **Method:** POST  
 - **URL:** `/cards/generate`  
-- **Description:** Generates a flashcard using AI based on provided text input.  
+- **Description:** Generates a flashcard using AI based on referenced original content.  
 - **Headers:** `Authorization: Bearer JWT_TOKEN_HERE`  
 - **Request Payload:**
     ```json
     {
-      "original_content": "Long text with 1000 to 10000 characters..."
+      "original_content_id": "1"
     }
     ```
 - **Response:**
@@ -236,7 +236,7 @@
     {
       "id": 102,
       "user_id": 1,
-      "original_content": "Long text with 1000 to 10000 characters...",
+      "original_content_id": "1",
       "front": "Generated summary question...",
       "back": "Generated detailed answer...",
       "generated_by": "AI",
@@ -244,7 +244,7 @@
     }
     ```
 - **Success Codes:** 201 Created  
-- **Error Codes:** 400 Bad Request (if text length is out of bounds), 401 Unauthorized, 422 Unprocessable Entity (if AI generation fails)
+- **Error Codes:** 400 Bad Request, 401 Unauthorized, 404 Not Found (if original content doesn't exist), 422 Unprocessable Entity (if AI generation fails)
 
 #### Get Cards List
 - **Method:** GET  
@@ -289,7 +289,7 @@
     {
       "id": 102,
       "user_id": 1,
-      "original_content": "Long text with 1000 to 10000 characters...",
+      "original_content_id": "1",
       "front": "Generated summary question...",
       "back": "Generated detailed answer...",
       "generated_by": "AI",
@@ -376,21 +376,21 @@
 - **Validation:**  
   - **Users:** Ensure email uniqueness and enforce required fields for registration.
   - **Cards:**  
-    - Validate `original_content` length (1000–10000 characters) when generating via AI.  
+    - Validate that `original_content_id` references an existing content entry when provided
     - Validate `front` (1–1000 characters) and `back` (1–5000 characters) on all card creation and updates.  
     - Check that `generated_by` is either `"AI"` or `"human"`.
   - **Error Logs:** Ensure association with a valid card ID.
 
 - **Business Logic Implementation:**  
   - **AI Card Generation:**  
-    - Endpoint `/cards/generate` accepts long text; backend calls the AI service (such as Openrouter.ai) to generate flashcard content using summarization and content-editing techniques.  
+    - Endpoint `/cards/generate` accepts an original content ID; backend retrieves the content and calls the AI service (such as Openrouter.ai) to generate flashcard content using summarization and content-editing techniques.  
     - The generated card data is then validated against business rules before being saved.
   - **Manual Card Creation:**  
     - Users can create or edit cards; updates are saved immediately and reflect user modifications.
   - **Pagination, Filtering, and Sorting:**  
     - List endpoints (e.g., `/cards`) implement pagination by accepting `page` and `limit` query parameters, along with optional filters (such as `generated_by`) and sorting options.
   - **Row Level Security (RLS):**  
-    - The API sets the current user’s ID (e.g., via request context) to ensure the database applies RLS policies when querying the `cards` table.
+    - The API sets the current user's ID (e.g., via request context) to ensure the database applies RLS policies when querying the `cards` table.
 
 - **Error Handling:**  
   - Use early returns and guard clauses to manage unexpected conditions.  
