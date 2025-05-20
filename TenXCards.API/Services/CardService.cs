@@ -50,7 +50,7 @@ public class CardService : ICardService
     #region Save Card
     public async Task<CardDto> CreateCardAsync(SaveCardCommand command, int userId)
     {
-        /*var transaction = _dbContext.Database.BeginTransaction();
+        var transaction = _dbContext.Database.BeginTransaction();
         try
         {
             var card = new Card
@@ -59,7 +59,7 @@ public class CardService : ICardService
                 Front = command.Front,
                 Back = command.Back,
                 GeneratedBy = command.GeneratedBy,
-                OriginalContent = command.OriginalContent,
+                OriginalContentId = command.OriginalContentId,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -70,17 +70,7 @@ public class CardService : ICardService
             // Invalidate cache for this user's card lists
             InvalidateUserCardListCache(userId);
 
-            return new CardDto
-            {
-                Id = card.Id,
-                UserId = card.UserId,
-                Front = card.Front,
-                Back = card.Back,
-                GeneratedBy = card.GeneratedBy,
-                OriginalContent = card.OriginalContent,
-                CreatedAt = card.CreatedAt,
-                UpdatedAt = null
-            };
+            return await GetCardByIdAsync(card.Id, userId);
         }
         catch (Exception ex)
         {
@@ -88,6 +78,7 @@ public class CardService : ICardService
             throw new ApplicationException("Failed to create card", ex);
         }*/
         return null;
+    }
     }
     #endregion
 
@@ -157,13 +148,23 @@ public class CardService : ICardService
                 .Select(c => new CardDto
                 {
                     Id = c.Id,
-                    UserId = c.UserId,
+                    User = new UserDto
+                    {
+                        Id = c.UserId,
+                        FirstName = c.User.FirstName,
+                        LastName = c.User.LastName,
+                        CreatedAt = c.User.CreatedAt,
+                        Email = c.User.Email
+                    },
                     Front = c.Front,
                     Back = c.Back,
                     GeneratedBy = c.GeneratedBy,
-                    OriginalContent = c.OriginalContent,
-                    CreatedAt = c.CreatedAt,
-                    UpdatedAt = null
+                    OriginalContent = new OriginalContentDto
+                    {
+                        Id = c.OriginalContentId,
+                        Content = c.OriginalContent.Content
+                    },
+                    CreatedAt = c.CreatedAt                    
                 })
                 .FirstOrDefaultAsync();
 
@@ -180,6 +181,7 @@ public class CardService : ICardService
             throw new ApplicationException("Failed to retrieve card", ex);
         }*/
         return null;
+    }
     }
     #endregion
 
@@ -210,17 +212,7 @@ public class CardService : ICardService
             InvalidateUserCardListCache(userId);
             InvalidateUserSingleCardCache(userId, cardId);
 
-            return new CardDto
-            {
-                Id = card.Id,
-                UserId = card.UserId,
-                Front = card.Front,
-                Back = card.Back,
-                GeneratedBy = card.GeneratedBy,
-                OriginalContent = card.OriginalContent,
-                CreatedAt = card.CreatedAt,
-                //UpdatedAt = card.UpdatedAt
-            };
+            return await GetCardByIdAsync(card.Id, userId);
         }
         catch (Exception ex) when (ex is not KeyNotFoundException)
         {
@@ -407,11 +399,22 @@ Odpowiedź zwróć w formacie JSON:
             .Select(c => new CardDto
             {
                 Id = c.Id,
-                UserId = c.UserId,
+                User = new UserDto
+                {
+                    Id = c.UserId,
+                    FirstName = c.User.FirstName,
+                    LastName = c.User.LastName,
+                    CreatedAt = c.User.CreatedAt,
+                    Email = c.User.Email
+                },
                 Front = c.Front,
                 Back = c.Back,
                 GeneratedBy = c.GeneratedBy,
-                OriginalContent = c.OriginalContent,
+                OriginalContent = new OriginalContentDto
+                {
+                    Id = c.OriginalContentId,
+                    Content = c.OriginalContent.Content
+                },
                 CreatedAt = c.CreatedAt,
                 //UpdatedAt = c.UpdatedAt
             })
