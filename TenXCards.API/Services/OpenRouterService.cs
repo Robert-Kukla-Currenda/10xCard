@@ -43,11 +43,11 @@ namespace TenXCards.API.Services.OpenRouter
         }
 
 
-        public async Task<string> SendMessageAsync(string message, MessageRole role)
+        public async Task<string> SendMessageAsync(Prompt prompt)
         {
-            if (string.IsNullOrWhiteSpace(message))
+            if (prompt is null || prompt.messages is null || prompt.messages.Count() == 0)
             {
-                throw new ValidationException("Message cannot be empty");
+                throw new ValidationException("Prompt cannot be empty");
             }
 
             try
@@ -55,9 +55,9 @@ namespace TenXCards.API.Services.OpenRouter
                 var payload = new ChatPayload
                 {
                     Model = _options.OpenRouterModelName,
-                    Messages = new List<Message> { new() { Role = role, Content = message } },
-                    //Temperature = _modelParameters.Temperature,
-                    //MaxTokens = _modelParameters.MaxTokens,
+                    Messages = prompt.messages,
+                    Temperature = _modelParameters.Temperature,
+                    MaxTokens = _modelParameters.MaxTokens,
                     ResponseFormat = new ResponseFormat
                     {
                         JsonSchema = new JsonSchema
@@ -70,25 +70,31 @@ namespace TenXCards.API.Services.OpenRouter
                 //using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(_options.TimeoutSeconds));
                 //using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, cancellationToken);
 
+                var jsonSerializatonOptions = new JsonSerializerOptions
+                {
+                    Converters =
+                    {
+                        new System.Text.Json.Serialization.JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+                    },
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = true
+                };                
 
-                //HttpClient client = new HttpClient();
-                var c = await _httpClient.GetAsync("/api/v1/create555");
-                //var response = await _httpClient.PostAsJsonAsync("/api/v1/create555", payload, CancellationToken.None);
+                var response = await _httpClient.PostAsJsonAsync("/api/v1/chat/completions", payload, jsonSerializatonOptions, CancellationToken.None);
+                
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    throw new NetworkException(
+                        $"API request failed: {response.StatusCode}",
+                        new { response.StatusCode, Content = errorContent });
+                }
 
-                //if (!response.IsSuccessStatusCode)
-                //{
-                //    var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-                //    throw new NetworkException(
-                //        $"API request failed: {response.StatusCode}",
-                //        new { StatusCode = response.StatusCode, Content = errorContent });
-                //}
+                var r = await response.Content.ReadAsStringAsync();
+                var result = await response.Content.ReadFromJsonAsync<JsonDocument>();
 
-                //var result = await response.Content.ReadFromJsonAsync<JsonDocument>(
-                //    cancellationToken: cancellationToken);
-
-                //return result?.RootElement.GetProperty("result").GetString()
-                //    ?? throw new ValidationException("Invalid response format - missing result");
-                return "fdsf";
+                return result?.RootElement.GetProperty("choices").GetString()
+                    ?? throw new ValidationException("Invalid response format - missing result");                
             }
             catch (Exception ex) when (ex is not OpenRouterException)
             {

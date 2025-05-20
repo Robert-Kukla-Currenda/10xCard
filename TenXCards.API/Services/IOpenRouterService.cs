@@ -12,6 +12,6 @@ namespace TenXCards.API.Services
         /// <param name="cancellationToken">Cancellation token for the operation.</param>
         /// <returns>The response from the OpenRouter API.</returns>
         /// <exception cref="ValidationException">Thrown when the message is empty or null.</exception>
-        Task<string> SendMessageAsync(string message, MessageRole role);
+        Task<string> SendMessageAsync(Prompt prompt);
     }
 }

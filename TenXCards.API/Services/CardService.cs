@@ -1,13 +1,16 @@
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Exceptions;
 using TenXCards.API.Configuration;
 using TenXCards.API.Controllers;
 using TenXCards.API.Data;
 using TenXCards.API.Data.Models;
 using TenXCards.API.Exceptions;
+using TenXCards.API.Migrations;
 using TenXCards.API.Models;
 using TenXCards.API.Models.OpenRouter;
 
@@ -76,9 +79,7 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error creating card for user {UserId}", userId);
             throw new ApplicationException("Failed to create card", ex);
-        }*/
-        return null;
-    }
+        }
     }
     #endregion
 
@@ -131,7 +132,6 @@ public class CardService : ICardService
     #region Get Single Card
     public async Task<CardDto> GetCardByIdAsync(int cardId, int userId)
     {
-        /*
         try
         {
             // Try to get from cache first
@@ -179,16 +179,13 @@ public class CardService : ICardService
         {
             _logger.LogError(ex, "Error getting card {CardId} for user {UserId}", cardId, userId);
             throw new ApplicationException("Failed to retrieve card", ex);
-        }*/
-        return null;
-    }
+        }
     }
     #endregion
 
     #region Update Card
     public async Task<CardDto> UpdateCardAsync(int cardId, UpdateCardCommand command, int userId)
     {
-        /*
         using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try
         {
@@ -219,8 +216,6 @@ public class CardService : ICardService
             _logger.LogError(ex, "Error updating card {CardId} for user {UserId}", cardId, userId);
             throw new ApplicationException("Failed to update card", ex);
         }
-        */
-        return null;
     }
     #endregion
     
@@ -272,15 +267,38 @@ public class CardService : ICardService
         }
 
         try
-        {
-            var x = await _openRouterService.SendMessageAsync(command.OriginalContent, MessageRole.User);
+        {            
+            var systemMessage = "Jesteś ekspertem w tworzeniu fiszek edukacyjnych.";
+            var userMessage = $@"
+Przeanalizuj poniższy tekst i stwórz fiszkę do nauki:
+1. Na przedniej stronie umieść krótkie, zwięzłe pytanie (maksymalnie 1000 znaków).
+2. Na tylnej stronie umieść szczegółową odpowiedź (maksymalnie 5000 znaków).
+
+Tekst do analizy:
+{command.OriginalContent}
+
+Odpowiedź zwróć w formacie JSON:
+{{
+    ""front"": ""pytanie"",
+    ""back"": ""odpowiedź""
+}}";
+            var prompt = new Prompt
+            {
+                messages = new List<Message>
+                {
+                    new() { Role = MessageRole.System, Content = systemMessage },
+                    new() { Role = MessageRole.User, Content = userMessage }
+                }
+            };
+            
+            var x = await _openRouterService.SendMessageAsync(prompt);
 
             // Generowanie fiszki przy użyciu AI
             //var (front, back) = await GenerateCardContentAsync(command.OriginalContent);
 
             return new CardDto() { Back = x };
         }
-        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or OpenApiException)
         {
             _logger.LogError(ex, "AI service communication error");
             throw new AIGenerationException("Failed to communicate with AI service", ex);
@@ -373,7 +391,6 @@ Odpowiedź zwróć w formacie JSON:
 
     private async Task<PaginatedResult<CardDto>> GetCardsFromDatabase(GetPagedListQuery query, int userId)
     {
-        /*
         var cardsQuery = _dbContext.Cards
             .Where(c => c.UserId == userId);
 
@@ -416,7 +433,6 @@ Odpowiedź zwróć w formacie JSON:
                     Content = c.OriginalContent.Content
                 },
                 CreatedAt = c.CreatedAt,
-                //UpdatedAt = c.UpdatedAt
             })
             .ToListAsync();
 
@@ -427,8 +443,6 @@ Odpowiedź zwróć w formacie JSON:
             Limit = query.Limit,
             Total = total
         };
-        */
-        return null;
     }
 
     private void InvalidateUserCardListCache(int userId)
