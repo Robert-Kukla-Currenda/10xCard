@@ -22,5 +22,5 @@ public interface ICardService
     /// <returns>Generated card data</returns>
     /// <exception cref="ValidationException">Thrown when input validation fails</exception>
     /// <exception cref="AIGenerationException">Thrown when AI service fails to generate card</exception>
-    Task<CardDto> GenerateCardAsync(GenerateCardCommand command, int userId);
+    Task<List<CardDto>> GenerateCardAsync(GenerateCardCommand command, int userId);
 }

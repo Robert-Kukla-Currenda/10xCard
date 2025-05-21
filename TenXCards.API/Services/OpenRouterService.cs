@@ -35,8 +35,8 @@ namespace TenXCards.API.Services.OpenRouter
 
             _modelParameters = new ModelParameters
             {
-                //Temperature = configuration.GetValue<double>("OpenRouter:Temperature", 0.7),
-                //MaxTokens = configuration.GetValue<int>("OpenRouter:MaxTokens", 256)
+                Temperature = _options.ModelTemperature,
+                MaxTokens = _options.ModelMaxTokens
             };
             
             _errorLoggingService = errorLoggingService;
@@ -65,10 +65,7 @@ namespace TenXCards.API.Services.OpenRouter
                             Schema = new Dictionary<string, string> { { "result", "string" } }
                         }
                     }
-                };
-
-                //using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(_options.TimeoutSeconds));
-                //using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, cancellationToken);
+                };                
 
                 var jsonSerializatonOptions = new JsonSerializerOptions
                 {

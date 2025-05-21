@@ -253,7 +253,7 @@ public class CardService : ICardService
     #endregion
 
     #region AI Card Generation
-    public async Task<CardDto> GenerateCardAsync(GenerateCardCommand command, int userId)
+    public async Task<List<CardDto>> GenerateCardAsync(GenerateCardCommand command, int userId)
     {
         // Walidacja wejścia
         if (string.IsNullOrEmpty(command.OriginalContent))
@@ -270,20 +270,24 @@ public class CardService : ICardService
         {            
             var systemMessage = "Jesteś ekspertem w tworzeniu fiszek edukacyjnych.";
             var userMessage = $@"
-Przeanalizuj poniższy tekst i stwórz fiszkę do nauki:
+Przeanalizuj poniższy tekst i stwórz fiszki do nauki:
 1. Na przedniej stronie umieść krótkie, zwięzłe pytanie (maksymalnie 1000 znaków).
 2. Na tylnej stronie umieść szczegółową odpowiedź (maksymalnie 5000 znaków).
+Fiszki powinny być któtkie, zwięzłe i łatwe do zapamiętania.
 
 Tekst do analizy:
 {command.OriginalContent}
 
 Odpowiedź zwróć w formacie JSON:
+[
 {{
     ""front"": ""pytanie"",
     ""back"": ""odpowiedź""
 }}
+]
 
 Zwrócona odpowiedź nie może mieć żadnych dodatkowych znaczników.";
+
             var prompt = new Prompt
             {
                 messages = new List<Message>
@@ -295,9 +299,15 @@ Zwrócona odpowiedź nie może mieć żadnych dodatkowych znaczników.";
             
             var aiResponse = await _openRouterService.SendMessageAsync(prompt);
 
-            var (front, back) = MapAIResponseToValues(aiResponse);
-
-            return new CardDto() { Front = front, Back = back };
+            var aiGeneratedCards = MapAIResponseToValues(aiResponse);
+            
+            return aiGeneratedCards.Select(c => new CardDto
+            {
+                Front = c.Front,
+                Back = c.Back,
+                GeneratedBy = "AI",
+                CreatedAt = DateTime.UtcNow,
+            }).ToList();
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or OpenApiException)
         {
@@ -306,18 +316,16 @@ Zwrócona odpowiedź nie może mieć żadnych dodatkowych znaczników.";
         }
     }
 
-    private CardContent MapAIResponseToValues(string aiResponse)
+    private List<CardContent> MapAIResponseToValues(string aiResponse)
     {
-        var cardContent = JsonSerializer.Deserialize<CardContent>(aiResponse,
+        var cards = JsonSerializer.Deserialize<List<CardContent>>(aiResponse,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        if (cardContent == null ||
-            string.IsNullOrEmpty(cardContent.Front) ||
-            string.IsNullOrEmpty(cardContent.Back))
+        if (cards == null || cards.Count==0)
         {
             throw new AIGenerationException("AI generated invalid card content");
         }
         
-        return cardContent;
+        return cards;
     }
 
     private record CardContent(string Front, string Back);

@@ -196,7 +196,7 @@ public class CardsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<CardDto>> GenerateCard([FromBody] GenerateCardCommand command)
+    public async Task<ActionResult<List<CardDto>>> GenerateCard([FromBody] GenerateCardCommand command)
     {
         try
         {
@@ -205,10 +205,10 @@ public class CardsController : ControllerBase
                 ?? throw new UnauthorizedAccessException("User ID not found in claims"));
 
             // Generate card using AI service
-            var card = await _cardService.GenerateCardAsync(command, userId);
+            var cards = await _cardService.GenerateCardAsync(command, userId);
 
             // Return created card
-            return Ok(card);
+            return Ok(cards);
         }
         catch (ValidationException ex)
         {
