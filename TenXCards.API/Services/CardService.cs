@@ -281,7 +281,9 @@ Odpowiedź zwróć w formacie JSON:
 {{
     ""front"": ""pytanie"",
     ""back"": ""odpowiedź""
-}}";
+}}
+
+Zwrócona odpowiedź nie może mieć żadnych dodatkowych znaczników.";
             var prompt = new Prompt
             {
                 messages = new List<Message>
@@ -291,12 +293,11 @@ Odpowiedź zwróć w formacie JSON:
                 }
             };
             
-            var x = await _openRouterService.SendMessageAsync(prompt);
+            var aiResponse = await _openRouterService.SendMessageAsync(prompt);
 
-            // Generowanie fiszki przy użyciu AI
-            //var (front, back) = await GenerateCardContentAsync(command.OriginalContent);
+            var (front, back) = MapAIResponseToValues(aiResponse);
 
-            return new CardDto() { Back = x };
+            return new CardDto() { Front = front, Back = back };
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or OpenApiException)
         {
@@ -305,83 +306,21 @@ Odpowiedź zwróć w formacie JSON:
         }
     }
 
-    private async Task<(string front, string back)> GenerateCardContentAsync(string originalContent)
+    private CardContent MapAIResponseToValues(string aiResponse)
     {
-        var prompt = $@"
-Przeanalizuj poniższy tekst i stwórz fiszkę do nauki:
-1. Na przedniej stronie umieść krótkie, zwięzłe pytanie (maksymalnie 1000 znaków).
-2. Na tylnej stronie umieść szczegółową odpowiedź (maksymalnie 5000 znaków).
-
-Tekst do analizy:
-{originalContent}
-
-Odpowiedź zwróć w formacie JSON:
-{{
-    ""front"": ""pytanie"",
-    ""back"": ""odpowiedź""
-}}";
-
-        var request = new
+        var cardContent = JsonSerializer.Deserialize<CardContent>(aiResponse,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        if (cardContent == null ||
+            string.IsNullOrEmpty(cardContent.Front) ||
+            string.IsNullOrEmpty(cardContent.Back))
         {
-            model = _options.OpenRouterModelName,
-            messages = new[]
-            {
-                new { role = "system", content = "Jesteś ekspertem w tworzeniu fiszek edukacyjnych." },
-                new { role = "user", content = prompt }
-            }
-        };
-
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_options.TimeoutSeconds));
-
-        var response = await _httpClient.PostAsJsonAsync("v1/chat/completions", request, cts.Token);
-        response.EnsureSuccessStatusCode();
-
-        var result = await response.Content.ReadFromJsonAsync<AIResponse>();
-
-        if (result?.Choices == null || result.Choices.Length == 0)
-        {
-            throw new AIGenerationException("AI service returned no results");
+            throw new AIGenerationException("AI generated invalid card content");
         }
-
-        try
-        {
-            // Parsowanie odpowiedzi JSON z AI
-            var cardContent = JsonSerializer.Deserialize<CardContent>(
-                result.Choices[0].Message.Content,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            );
-
-            if (cardContent == null ||
-                string.IsNullOrEmpty(cardContent.Front) ||
-                string.IsNullOrEmpty(cardContent.Back))
-            {
-                throw new AIGenerationException("AI generated invalid card content");
-            }
-
-            return (cardContent.Front, cardContent.Back);
-        }
-        catch (JsonException ex)
-        {
-            throw new AIGenerationException("Failed to parse AI response", ex);
-        }
+        
+        return cardContent;
     }
 
     private record CardContent(string Front, string Back);
-
-    private class AIResponse
-    {
-        public Choice[] Choices { get; set; } = Array.Empty<Choice>();
-
-        public class Choice
-        {
-            public Message Message { get; set; } = new();
-        }
-
-        public class Message
-        {
-            public string Content { get; set; } = string.Empty;
-        }
-    }
     #endregion
 
     #region Caching

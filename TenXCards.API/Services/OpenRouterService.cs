@@ -89,11 +89,14 @@ namespace TenXCards.API.Services.OpenRouter
                         $"API request failed: {response.StatusCode}",
                         new { response.StatusCode, Content = errorContent });
                 }
-
-                var r = await response.Content.ReadAsStringAsync();
+                
                 var result = await response.Content.ReadFromJsonAsync<JsonDocument>();
 
-                return result?.RootElement.GetProperty("choices").GetString()
+                return result?.RootElement.GetProperty("choices")
+                    .EnumerateArray().First()
+                    .GetProperty("message")
+                    .GetProperty("content")
+                    .GetString()
                     ?? throw new ValidationException("Invalid response format - missing result");                
             }
             catch (Exception ex) when (ex is not OpenRouterException)
