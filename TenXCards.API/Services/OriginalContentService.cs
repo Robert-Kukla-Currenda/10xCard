@@ -68,7 +68,15 @@ namespace TenXCards.API.Services
                 Id = content.Id,
                 UserId = content.UserId,
                 Content = content.Content,
-                CreatedAt = content.CreatedAt
+                CreatedAt = content.CreatedAt,
+                Cards = content.Cards.Select(c => new CardDto
+                {
+                    Id = c.Id,
+                    Front = c.Front,
+                    Back = c.Back,
+                    GeneratedBy = c.GeneratedBy,
+                    CreatedAt = c.CreatedAt
+                }).ToList()
             };
         }
 
@@ -95,7 +103,15 @@ namespace TenXCards.API.Services
                     Id = c.Id,
                     UserId = c.UserId,
                     Content = c.Content,
-                    CreatedAt = c.CreatedAt
+                    CreatedAt = c.CreatedAt,
+                    Cards = c.Cards.Select(card => new CardDto
+                    {
+                        Id = card.Id,
+                        Front = card.Front,
+                        Back = card.Back,
+                        GeneratedBy = card.GeneratedBy,
+                        CreatedAt = card.CreatedAt
+                    }).ToList()
                 })
                 .ToListAsync();
 

@@ -83,6 +83,9 @@ namespace TenXCards.API.Models
         public string Content { get; set; } = default!;
 
         public DateTime CreatedAt { get; set; }
+        
+        // Navigation property
+        public ICollection<CardDto> Cards { get; set; } = new List<CardDto>();
     }
 
     // -----------------------------------------
