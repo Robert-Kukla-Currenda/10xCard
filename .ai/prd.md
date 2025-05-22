@@ -9,13 +9,14 @@ Manualne tworzenie fiszek jest czasochłonne, co zniechęca użytkowników do ko
 ## 3. Wymagania funkcjonalne
 1. Generowanie fiszek przez AI
    - System przyjmuje tekst o długości od 1000 do 10000 znaków.
-   - Użycie technik streszczenia i redakcji treści do wygenerowania fiszki.
+   - Użycie technik streszczenia i redakcji treści do wygenerowania zestawu fiszek.
    - Użytkownik ma możliwość edycji treści wygenerowanej przez AI przed zatwierdzeniem.
-   - Tekst na frontowej strona fiszki nie może być dłuższy niż 1000 znaków.
-   - Tekst fiszki, nie może być dłuższy niż 5000 znaków.
+   - Tekst na frontowej strona pojedynczej fiszki nie może być dłuższy niż 1000 znaków.
+   - Tekst pojedynczej fiszki na tylnej stronie, nie może być dłuższy niż 5000 znaków.
    
 2. Manualne tworzenie fiszek
    - Umożliwienie użytkownikowi tworzenia, edycji, przeglądania i usuwania fiszek ręcznie.
+   - Możliwe jest manualne dodanie fiszki do fiszek wygenerowanych przez AI
    
 3. System kont użytkowników
    - Prosta rejestracja i logowanie.
@@ -39,27 +40,28 @@ Manualne tworzenie fiszek jest czasochłonne, co zniechęca użytkowników do ko
 
 ## 5. Historyjki użytkowników
 US-001  
-- Tytuł: Generowanie fiszki przez AI  
-- Opis: Jako użytkownik chcę wkleić tekst o długości 1000-10000 znaków, aby AI wygenerowało fiszkę wykorzystując techniki streszczenia i redakcji treści, co pozwoli mi zaoszczędzić czas.  
+- Tytuł: Generowanie fiszek przez AI  
+- Opis: Jako użytkownik chcę wkleić tekst o długości 1000-10000 znaków, aby AI wygenerowało zestaw fiszek wykorzystując techniki streszczenia i redakcji treści, co pozwoli mi zaoszczędzić czas.  
 - Kryteria akceptacji:
   1. Użytkownik wkleja tekst mieszczący się w określonym przedziale znaków.
-  2. System generuje fiszkę na podstawie wprowadzonego tekstu.
+  2. System generuje fiszki na podstawie wprowadzonego tekstu.
   3. Użytkownik może edytować wygenerowaną treść przed jej zatwierdzeniem.
 
 US-002  
-- Tytuł: Manualne tworzenie fiszki  
-- Opis: Jako użytkownik chcę móc ręcznie tworzyć fiszki, aby mieć pełną kontrolę nad treścią.  
+- Tytuł: Manualne tworzenie fiszek  
+- Opis: Jako użytkownik chcę móc ręcznie tworzyć fiszek, aby mieć pełną kontrolę nad treścią.  
 - Kryteria akceptacji:
-  1. Użytkownik otrzymuje interfejs do wprowadzania treści fiszki.
-  2. Fiszka jest zapisywana i dostępna w systemie po zatwierdzeniu.
+  1. Użytkownik otrzymuje interfejs do wprowadzania treści fiszek.
+  2. Fiszki są zapisywane i dostępne w systemie po zatwierdzeniu.
 
 US-003  
 - Tytuł: Przeglądanie, edycja i usuwanie fiszek  
 - Opis: Jako użytkownik chcę przeglądać, edytować i usuwać istniejące fiszki, aby móc zarządzać swoimi materiałami edukacyjnymi.  
 - Kryteria akceptacji:
-  1. Użytkownik widzi listę zapisanych fiszek.
-  2. Użytkownik może wybrać fiszkę do edycji lub usunięcia.
-  3. Zmiany są natychmiast zapisywane i widoczne w systemie.
+  1. Użytkownik widzi listę treści oraz powiązanych z nią fiszek.
+  2. Fiszki są zagnieżdżone pod treścią, z której zostały utworzone.
+  3. Użytkownik może wybrać fiszkę do edycji lub usunięcia.
+  4. Zmiany są natychmiast zapisywane i widoczne w systemie.
 
 US-004  
 - Tytuł: Rejestracja i logowanie użytkownika  
@@ -77,4 +79,4 @@ US-004
    - Co najmniej 75% fiszek stworzonych w systemie ma być generowanych przy użyciu AI.
    
 3. Czas generowania
-   - Czas potrzebny na generowanie fiszki przez AI nie powinien znacząco opóźniać całego procesu tworzenia.
+   - Czas potrzebny na generowanie fiszek przez AI nie powinien znacząco opóźniać całego procesu tworzenia.

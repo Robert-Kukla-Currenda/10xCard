@@ -136,7 +136,17 @@
           "id": 1,
           "user_id": 1,
           "content": "Long text content...",
-          "created_at": "2025-04-19T12:00:00Z"
+          "created_at": "2025-04-19T12:00:00Z",
+          "cards": [
+            {
+              "id": 1,
+              "user_id": 1,
+              "front": "Generated summary question...",
+              "back": "Generated detailed answer...",
+              "generated_by": "AI",
+              "created_at": "2025-04-19T12:10:00Z"
+            }
+          ]
         }
       ],
       "pagination": {

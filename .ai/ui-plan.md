@@ -21,22 +21,25 @@ Interfejs użytkownika MVP zostaje podzielony na kilka kluczowych widoków: ekra
 
 - **Dashboard (lista fiszek)**
   - **Ścieżka widoku:** `/dashboard`
-  - **Główny cel:** Prezentacja listy fiszek użytkownika.
+  - **Główny cel:** Prezentacja listy treści źródłowych, z których zostały wygenerowane fiszki, oraz umożliwienie przeglądania powiązanych fiszek.
   - **Kluczowe informacje do wyświetlenia:** 
-    - Skrócony fragment frontu fiszki (pierwsze 150 znaków),
-    - Typ generowania fiszki (AI lub Human),
-    - Data utworzenia oraz data ostatniej edycji.
-  - **Kluczowe komponenty widoku:** Lista lub karta fiszek, przyciski umożliwiające przejście do edycji/detalów.
-  - **UX, dostępność i względy bezpieczeństwa:** Przejrzysta prezentacja danych z dynamicznym ładowaniem na żądanie oraz możliwość sortowania i filtrowania (wg wymagań sortowanie domyślne od najnowszych).
+    - Lista treści źródłowych,
+    - Dla każdej treści, lista powiązanych fiszek zawierająca skrócony fragment frontu (150 znaków), typ generacji, daty utworzenia oraz daty ostatniej edycji.
+  - **Kluczowe komponenty widoku:** Komponent listy treści z rozwijalnymi sekcjami prezentującymi powiązane fiszki oraz przyciski umożliwiające przejście do edycji/detalów.
+  - **UX, dostępność i względy bezpieczeństwa:** Intuicyjna nawigacja między treściami i powiązanymi fiszkami, dynamiczne ładowanie na żądanie oraz możliwość sortowania i filtrowania (domyślnie sortowanie od najnowszych).
 
-- **Ekran generowania fiszki**
+- **Ekran tworzenia fiszek**
   - **Ścieżka widoku:** `/cards/generate`
-  - **Główny cel:** Umożliwienie generacji fiszki przy użyciu AI na podstawie wprowadzonego tekstu.
+  - **Główny cel:** Umożliwienie generacji fiszki przy użyciu AI lub ręcznie na podstawie wprowadzonego tekstu.
   - **Kluczowe informacje do wyświetlenia:** 
     - Pole tekstowe do wprowadzenia treści źródłowej (1000–10000 znaków),
-    - Pola wyświetlające wygenerowany front i tył fiszki.
-  - **Kluczowe komponenty widoku:** Formularz generowania – pole do wprowadzenia treści, przycisk "Generuj" (wywołanie AI), przycisk "Zapisz" do zatwierdzenia wygenerowanej fiszki, dynamiczna aktualizacja pola.
-  - **UX, dostępność i względy bezpieczeństwa:** Intuicyjna obsługa, dynamiczna walidacja inline oraz informowanie użytkownika o błędach poprzez toast notifications.
+    - Generowanie automatyczne za pomocą przycisku generuj,
+    - Tworzenie manualme, za pomocą przycisku "Dodaj nową fiszkę",
+    - Pola wyświetlające wygenerowany front i tył fiszki,
+    - Dodanie nowej fiszki skutkuje podpięcie jej do tresci, na podstawie której została wygenerowana,
+    - Informacja o możliwości dodawania wielu fiszek do jednej treści.
+  - **Kluczowe komponenty widoku:** Formularz generowania – pole do wprowadzenia treści, przycisk "Generuj" (dla AI) lub interfejs do manualnego wprowadzania danych, przycisk "Zapisz" do zatwierdzenia fiszki, dynamiczna aktualizacja pola.
+  - **UX, dostępność i względy bezpieczeństwa:** Intuicyjna obsługa z możliwością wyboru metody generacji, dynamiczna walidacja inline oraz informowanie użytkownika o błędach poprzez toast notifications.
 
 - **Ekran edycji fiszki**
   - **Ścieżka widoku:** `/cards/edit/{id}`
@@ -53,21 +56,28 @@ Interfejs użytkownika MVP zostaje podzielony na kilka kluczowych widoków: ekra
   - **UX, dostępność i względy bezpieczeństwa:** Czytelny podgląd błędów z łatwym dostępem przez menu boczne, brak dodatkowych filtrów w MVP.
 
 ## 3. Mapa podróży użytkownika
-1. **Logowanie/Rejestracja:** Użytkownik rozpoczyna od ekranu logowania `/login` lub, w przypadku nowych użytkowników, przechodzi do rejestracji `/register`.
-2. **Dashboard:** Po pomyślnym zalogowaniu użytkownik trafia do dashboardu `/dashboard`, gdzie przegląda listę zapisanych fiszek.
-3. **Generowanie fiszki:** Użytkownik wybiera opcję generowania fiszki z menu bocznego, przechodząc do ekranu `/cards/generate`. Tam wprowadza treść źródłową, klika przycisk "Generuj", aby AI wygenerowało front i tył, a następnie zapisuje wynik przyciskiem "Zapisz". Po udanym zapisie fiszka pojawia się w dashboardzie.
-4. **Edycja fiszki:** Użytkownik może wybrać pojedynczą fiszkę z dashboardu, aby przejść do ekranu edycji `/cards/edit/{id}`, gdzie dokonuje zmian i zapisuje aktualizacje.
-5. **Logi błędów:** Użytkownik ma możliwość przejścia do sekcji logów błędów, gdzie przegląda listę błędów dotyczących generacji fiszek, sortowaną od najnowszych.
+1. **Logowanie/Rejestracja:**  
+   Użytkownik rozpoczyna od ekranu logowania `/login` lub, w przypadku nowych użytkowników, przechodzi do rejestracji `/register`. Proces ten zapewnia bezpieczny dostęp oraz umożliwia zarządzanie treściami edukacyjnymi na poziomie konta użytkownika.
+2. **Dashboard:**  
+   Po pomyślnym zalogowaniu użytkownik trafia do dashboardu `/dashboard`, gdzie widzi listę treści źródłowych. Dla każdej treści wyświetlana jest lista powiązanych fiszek – zarówno tych wygenerowanych automatycznie przez AI, jak i stworzonych manualnie – wraz z ich skróconymi fragmentami, typem generacji oraz datami utworzenia i edycji.
+3. **Generowanie fiszki:**  
+   Użytkownik wybiera opcję generowania fiszki z menu bocznego, przechodząc do ekranu `/cards/generate`. Na tym etapie możliwe jest:
+      - Wprowadzenie treści źródłowej i użycie AI do automatycznego generowania fiszek przy użyciu technik streszczenia i redakcji,
+      - Ręczne dodanie nowej fiszki poprzez interfejs „Dodaj nową fiszkę”.  
+   W obu przypadkach, wygenerowana lub stworzona fiszka jest powiązana z treścią bazową, a użytkownik zostaje umożliwiony jej dalszą edycję.
+4. **Edycja/Usuwanie fiszki:**  
+   Użytkownik może wybrać pojedynczą fiszkę z dashboardu, przechodząc do ekranu edycji `/cards/edit/{id}`, gdzie może ją modyfikować, zapisywać zmiany lub usuwać – niezależnie od tego, czy fiszka została wygenerowana przez AI, czy stworzona ręcznie.
+5. **Logi błędów:**  
+   W przypadku wystąpienia problemów podczas generowania fiszek, użytkownik ma dostęp do sekcji logów błędów (`/cards/errors`), gdzie przegląda listę błędów (sortowaną od najnowszych) oraz ich szczegółowe opisy.
 
 ## 4. Układ i struktura nawigacji
 - **Menu boczne:** Główny system nawigacji dostępny po zalogowaniu, zawiera odnośniki do:
   - Dashboard (lista fiszek)
   - Ekranu generowania fiszki
-  - Ekranu rejestracji/edycji (opcjonalnie dostęp do konta)
+  - Ekranu informacji o koncie użytkownika (imię, nazwisko, adres email, datę utworzenia) - brak możliwości edycji
   - Sekcji logów błędów
   - Opcji wylogowania
 - **Adaptacja mobilna:** Na urządzeniach mobilnych menu boczne będzie wyświetlane jako rozwijane menu (hamburger menu) z zachowaniem responsywności.
-- **Nawigacja kontekstowa:** W dashboardzie umożliwiony jest szybki dostęp do edycji pojedynczych fiszek przez kliknięcie w element listy.
 
 ## 5. Kluczowe komponenty
 - **Formularze:** Formularze logowania, rejestracji, generowania oraz edycji fiszek z dynamiczną walidacją inline.
