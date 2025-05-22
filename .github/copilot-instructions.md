@@ -1,58 +1,79 @@
 # AI Rules for {{project-name}}
 
-{{project-description}}
+This document provides best practices and guidelines for working on backend applications using .NET C#, frontend applications with Blazor, designing clear and useful user interfaces, and proper database design practices with Postgres.
 
-## Tech Stack
+---
 
-- Astro 5
-- TypeScript 5
-- React 19
-- Tailwind 4
-- Shadcn/ui
+## Table of Contents
 
-## Project Structure
+- Backend Best Practices
+- Frontend Best Practices
+- User Interface Design Guidelines
+- Database Design Best Practices
+- General Recommendations
 
-When introducing changes to the project, always follow the directory structure below:
+---
 
-- `./src` - source code
-- `./src/layouts` - Astro layouts
-- `./src/pages` - Astro pages
-- `./src/pages/api` - API endpoints
-- `./src/middleware/index.ts` - Astro middleware
-- `./src/db` - Supabase clients and types
-- `./src/types.ts` - Shared types for backend and frontend (Entities, DTOs)
-- `./src/components` - Client-side components written in Astro (static) and React (dynamic)
-- `./src/components/ui` - Client-side components from Shadcn/ui
-- `./src/lib` - Services and helpers
-- `./src/assets` - static internal assets
-- `./public` - public assets
+## Backend Best Practices
 
-When modifying the directory structure, always update this section.
+### Clean Code for Backend Applications (.NET C#)
 
-## Coding practices
+- **Separation of Concerns**:  
+  Divide your code into layers (e.g., API, business logic, data access). Each layer should have a well-defined responsibility.
 
-### Guidelines for clean code
+- **SOLID Principles**:  
+  Follow SOLID design principles to make your code maintainable and scalable.
 
-- Use feedback from linters to improve the code when making changes.
-- Prioritize error handling and edge cases.
-- Handle errors and edge cases at the beginning of functions.
-- Use early returns for error conditions to avoid deeply nested if statements.
-- Place the happy path last in the function for improved readability.
-- Avoid unnecessary else statements; use if-return pattern instead.
-- Use guard clauses to handle preconditions and invalid states early.
-- Implement proper error logging and user-friendly error messages.
-- Consider using custom error types or error factories for consistent error handling.
+- **Error Handling & Logging**:  
+  - Use try-catch blocks around critical code.  
+  - Implement centralized logging using frameworks like Serilog or NLog.  
+  - Provide meaningful error messages for debugging and production troubleshooting without exposing sensitive information.
 
-## Frontend
+- **Dependency Injection**:  
+  Use built-in ASP.NET Core dependency injection to manage service lifetimes.
 
-### General Guidelines
+- **Unit Testing**:  
+  Design your code in a testable manner and include unit tests using frameworks like xUnit or NUnit.
 
-- Use Astro components (.astro) for static content and layout
-- Implement framework components in React only when interactivity is needed
+- **Code Readability**:  
+  - Write self-explanatory and descriptive method and variable names.  
+  - Separate complex logic into smaller, reusable methods.  
+  - Use comments and XML documentation where necessary.
 
-### Guidelines for Styling
+- **Performance Optimization**:  
+  - Emphasize asynchronous programming (async/await) where possible.  
+  - Profile and optimize performance hotspots.
 
-#### Tailwind
+- **Security**:  
+  - Validate all input data on the server side.  
+  - Implement proper authentication and authorization mechanisms, such as ASP.NET Core Identity or OAuth providers.
+
+---
+
+## Frontend Best Practices
+
+### Clean Code for Frontend Applications (Blazor)
+
+- **Component-based Architecture**:  
+  - Develop UI using reusable components.  
+  - Break down complex pages into smaller, manageable Blazor components.
+
+- **Data Binding & State Management**:  
+  - Use two-way data binding carefully to ensure state consistency.  
+  - Leverage state management patterns or libraries when the application state gets complex.
+
+- **Maintainability**:  
+  - Keep component logic separate from UI rendering.  
+  - Use code-behind files for logic to keep .razor files clean.
+
+- **Performance**:  
+  - Avoid unnecessary re-rendering by using Blazor component lifecycle methods effectively.  
+  - Consider leveraging `@key` in loops to optimize rendering.
+
+- **Testing**:  
+  - Create component tests using frameworks like bUnit to ensure UI components behave as expected.
+
+### Tailwind
 
 - Use the @layer directive to organize styles into components, utilities, and base layers
 - Use arbitrary values with square brackets (e.g., w-[123px]) for precise one-off designs
@@ -62,52 +83,78 @@ When modifying the directory structure, always update this section.
 - Use responsive variants (sm:, md:, lg:, etc.) for adaptive designs
 - Leverage state variants (hover:, focus-visible:, active:, etc.) for interactive elements
 
-### Guidelines for Accessibility
+---
 
-#### ARIA Best Practices
+## User Interface Design Guidelines
 
-- Use ARIA landmarks to identify regions of the page (main, navigation, search, etc.)
-- Apply appropriate ARIA roles to custom interface elements that lack semantic HTML equivalents
-- Set aria-expanded and aria-controls for expandable content like accordions and dropdowns
-- Use aria-live regions with appropriate politeness settings for dynamic content updates
-- Implement aria-hidden to hide decorative or duplicative content from screen readers
-- Apply aria-label or aria-labelledby for elements without visible text labels
-- Use aria-describedby to associate descriptive text with form inputs or complex elements
-- Implement aria-current for indicating the current item in a set, navigation, or process
-- Avoid redundant ARIA that duplicates the semantics of native HTML elements
+### Designing a Clear and Usable User Interface
 
-### Guidelines for Astro
+- **Consistency**:  
+  - Keep visual consistency with colors, typography, and spacing.  
+  - Follow a design system or pattern library.
 
-- Leverage View Transitions API for smooth page transitions (use ClientRouter)
-- Use content collections with type safety for blog posts, documentation, etc.
-- Leverage Server Endpoints for API routes
-- Use POST, GET  - uppercase format for endpoint handlers
-- Use `export const prerender = false` for API routes
-- Use zod for input validation in API routes
-- Extract logic into services in `src/lib/services`
-- Implement middleware for request/response modification
-- Use image optimization with the Astro Image integration
-- Implement hybrid rendering with server-side rendering where needed
-- Use Astro.cookies for server-side cookie management
-- Leverage import.meta.env for environment variables
+- **Accessibility**:  
+  - Use semantic HTML elements and ARIA roles where appropriate.  
+  - Ensure color contrast meets accessibility standards.  
+  - Provide keyboard navigation support and focus management.
 
-### Guidelines for React
+- **Feedback and Responsiveness**:  
+  - Inform users of actions with visual feedback (loading indicators, button states).  
+  - Ensure the UI adapts to various screen sizes and orientations (responsive design).
 
-- Use functional components with hooks instead of class components
-- Never use "use client" and other Next.js directives as we use React with Astro
-- Extract logic into custom hooks in `src/components/hooks`
-- Implement React.memo() for expensive components that render often with the same props
-- Utilize React.lazy() and Suspense for code-splitting and performance optimization
-- Use the useCallback hook for event handlers passed to child components to prevent unnecessary re-renders
-- Prefer useMemo for expensive calculations to avoid recomputation on every render
-- Implement useId() for generating unique IDs for accessibility attributes
-- Consider using the new useOptimistic hook for optimistic UI updates in forms
-- Use useTransition for non-urgent state updates to keep the UI responsive
+- **Simplicity**:  
+  - Keep the interface simple and intuitive.  
+  - Minimize unnecessary elements and provide a clear hierarchy of information.
 
-### Backend and Database
+- **User Testing**:  
+  - Regularly perform usability testing and iterate based on user feedback.
 
-- Use Supabase for backend services, including authentication and database interactions.
-- Follow Supabase guidelines for security and performance.
-- Use Zod schemas to validate data exchanged with the backend.
-- Use supabase from context.locals in Astro routes instead of importing supabaseClient directly
-- Use SupabaseClient type from `src/db/supabase.client.ts`, not from `@supabase/supabase-js`
+---
+
+## Database Design Best Practices
+
+### Best Practices for Postgres
+
+- **Normalization and Schema Design**:  
+  - Normalize your database to avoid redundancy but consider denormalization for performance when needed.  
+  - Use clear, consistent naming conventions for tables, columns, and indexes.
+
+- **Indexes and Performance**:  
+  - Create indexes on columns used frequently in WHERE clauses, JOIN operations, and as foreign keys.  
+  - Regularly analyze and optimize query performance.
+
+- **Transactions and Concurrency**:  
+  - Use transactions to ensure data consistency.  
+  - Implement appropriate isolation levels to handle concurrent access effectively.
+
+- **Security**:  
+  - Restrict database access with proper roles and permissions.  
+  - Use secure connections (SSL/TLS) and avoid storing sensitive information in plaintext.
+
+- **Backup and Recovery**:  
+  - Plan for regular backups and test your recovery process to mitigate data loss risks.
+
+- **Monitoring and Maintenance**:  
+  - Regularly monitor database performance and tune queries and indexes.  
+  - Plan for maintenance tasks like vacuuming and analyzing tables.
+
+---
+
+## General Recommendations
+
+- **Continuous Integration/Continuous Deployment (CI/CD)**:  
+  Automate your build and deployment processes to catch issues early and deploy reliably.
+
+- **Branching Strategy**:  
+  Follow a clear branching strategy such as Gitflow for version control.
+
+- **Documentation**:  
+  - Maintain up-to-date documentation for your code and architectural decisions.  
+  - Ensure your API documentation is clear, perhaps using tools like Swagger.
+
+- **Code Reviews**:  
+  Regularly perform peer code reviews to maintain code quality and share knowledge among the team.
+
+---
+
+By following these guidelines, developers can build reliable, maintainable, and scalable applications with .NET C#, Blazor, and Postgres while ensuring a clear and accessible user interface.
