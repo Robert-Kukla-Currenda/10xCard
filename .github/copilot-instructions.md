@@ -52,6 +52,20 @@ This document provides best practices and guidelines for working on backend appl
 
 ## Frontend Best Practices
 
+### Frontend project
+
+- **Main project files**:
+  - _Imports.razor – A file importing namespaces and other resources used in the Blazor application.
+  - App.razor – The main component of the Blazor application, defining the layout and router of the application.
+  - Program.cs – The entry point of the application, configuring services and starting the Blazor application.
+  - {{projest_name}}.csproj – The .NET project file defining dependencies and project settings.
+- **Folders**:
+  - bin/ and obj/ – Automatically generated folders by the .NET build system, containing binaries and temporary files.
+  - Layout/ – Contains application layouts, e.g., MainLayout.razor, which defines the main page layout.
+  - Pages/ – A folder storing Blazor application pages (e.g., .razor components representing different views).
+  - Properties/ – Contains project configuration files.
+  - wwwroot/ – A public folder containing static resources such as CSS, JavaScript, images, etc.
+
 ### Clean Code for Frontend Applications (Blazor)
 
 - **Component-based Architecture**:  
