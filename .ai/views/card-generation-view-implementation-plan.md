@@ -1,20 +1,20 @@
 # Plan implementacji widoku generate
 
 ## 1. Przegląd
-Widok ten pozwala użytkownikowi wprowadzić tekst źródłowy (1000–10000 znaków) i skorzystać z usługi AI do wygenerowania fiszki. Użytkownik może następnie edytować wygenerowany front i tył fiszki oraz zapisać ją w systemie.
+Widok ten pozwala użytkownikowi wprowadzić tekst źródłowy (1000–10000 znaków) i skorzystać z usługi AI do wygenerowania fiszek. Użytkownik może następnie edytować wygenerowany front i tył fiszek oraz zapisać je w systemie.
 
 ## 2. Routing widoku
 Widok będzie dostępny pod ścieżką:  
-`/api/cards/generate`
+`/cards/generate`
 
 ## 3. Struktura komponentów
 1. **GenerateCardPage** (strona główna widoku)  
-   - Zawiera formularz do wpisania treści oraz sekcję z wygenerowaną fiszką.  
+   - Zawiera formularz do wpisania treści oraz sekcję z wygenerowanymi fiszkami.  
 2. **GenerateForm** (formularz generowania)  
    - Pole tekstowe do wprowadzenia treści źródłowej oraz przycisk "Generuj".  
-3. **GeneratedCardPreview** (podgląd wygenerowanej fiszki)  
+3. **GeneratedCardPreview** (podgląd wygenerowanych fiszek)  
    - Wyświetla pola front i back wraz z możliwością edycji.  
-   - Zawiera przycisk zapisu, który wysyła finalne dane do API.
+   - Zawiera przycisk zapisu, który wysyła wszystkie wygenerowane fiszki do API.
 
 ## 4. Szczegóły komponentów
 
@@ -22,10 +22,10 @@ Widok będzie dostępny pod ścieżką:
 - **Opis**: Komponent rodzic kontrolujący przepływ danych pomiędzy formularzem generowania a miejscem wyświetlania rezultatów.
 - **Główne elementy**:
   - Sekcja formularza (komponent **GenerateForm**).
-  - Sekcja podglądu fiszki (komponent **GeneratedCardPreview**).
+  - Sekcja podglądu fiszek (komponent **GeneratedCardPreview**).
 - **Obsługiwane interakcje**:
   - Otrzymanie danych wygenerowanych przez AI z API.
-  - Przekazanie danych do podglądu fiszki.
+  - Przekazanie danych do podglądu fiszek.
 - **Walidacja**: Sprawdzenie minimalnej i maksymalnej długości tekstu (1000–10000 znaków) przed wysłaniem do API.
 - **Typy**:  
   - Zależne od DTO: `GenerateCardCommand`, `CardDto`.  
@@ -33,13 +33,13 @@ Widok będzie dostępny pod ścieżką:
   - Brak bezpośrednich, komponuje dzieci.
 
 ### GenerateForm
-- **Opis**: Formularz wpisywania treści źródłowej i inicjacji żądania generowania fiszki.
+- **Opis**: Formularz wpisywania treści źródłowej i inicjacji żądania generowania fiszek.
 - **Główne elementy**:
   - Pole wielowierszowe do wprowadzenia tekstu.
   - Przycisk "Generuj".
 - **Obsługiwane interakcje**:
   - OnSubmit – walidacja długości tekstu.
-  - Kliknięcie "Generuj" – wysłanie żądania POST do `/cards/generate`.
+  - Kliknięcie "Generuj" – wysłanie żądania POST do `/api/cards/generate`.
 - **Walidacja**:
   - Tekst min. 1000 i max. 10000 znaków.
 - **Typy**:
@@ -48,7 +48,7 @@ Widok będzie dostępny pod ścieżką:
   - Funktor lub handler typu `(originalContent: string) => void`, wywoływany przy prawidłowym wprowadzeniu danych.
 
 ### GeneratedCardPreview
-- **Opis**: Wyświetla pola front i back wygenerowanej fiszki, pozwala na ewentualną korektę i zapis.
+- **Opis**: Wyświetla pola front i back wygenerowanych fiszek, pozwala na ewentualną korektę i zapis wszystkich fiszek.
 - **Główne elementy**:
   - Dwa pola tekstowe: "Front" i "Back".
   - Przycisk "Zapisz".
