@@ -1,28 +1,40 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Routing
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">TenXCards</a>
     </div>
 </div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
+<div class="@NavMenuCssClass nav-scrollable">
+    <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                <i class="fas fa-home me-2"></i> Home
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="register">
-                <span class="bi bi-person-plus-fill-nav-menu" aria-hidden="true"></span> Zarejestruj się
+                <i class="fas fa-user-plus me-2"></i> Zarejestruj się
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="login">
-                <span class="bi bi-box-arrow-in-right-nav-menu" aria-hidden="true"></span> Zaloguj się
+                <span class="bi bi-box-arrow-in-right" aria-hidden="true"></span> Zaloguj się
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="cards/generate">
+                <span class="bi bi-plus-square" aria-hidden="true"></span> Generuj fiszkę
             </NavLink>
         </div>
     </nav>
 </div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
+}
 

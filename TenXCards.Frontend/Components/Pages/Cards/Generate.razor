@@ -1,0 +1,261 @@
+@page "/cards/generate"
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using TenXCards.API.Models
+@using TenXCards.Frontend.Components.Cards
+@using MudBlazor
+@using MudBlazor.Utilities
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@rendermode InteractiveServer
+
+<PageTitle>Generowanie fiszki - TenXCards</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="pa-4">
+    <MudPaper Elevation="3" Class="pa-4">
+        <MudText Typo="Typo.h4" Class="mb-4" Align="Align.Center">Generuj fiszki</MudText>
+
+        <EditForm Model="_model" OnValidSubmit="HandleValidSubmit" FormName="generate">
+            <DataAnnotationsValidator />
+
+            <MudCard Class="mb-4">
+                <MudCardContent>
+                    <MudTextField T="string"
+                    @bind-Value="_model.Content"
+                    Label="Treść do przetworzenia"
+                    Lines="10"
+                    MaxLength="10000"                    
+                    Immediate="true"
+                    Variant="Variant.Outlined"
+                    HelperText="Wprowadź tekst do wygenerowania fiszki (minimum 1000 znaków)"
+                    Class="mb-3" />
+                    <ValidationMessage For="@(() => _model.Content)" />
+                </MudCardContent>
+            </MudCard>
+
+            @if (_model.Cards != null && _model.Cards.Any())
+            {                
+                <MudCard Class="mb-4">
+                        <MudCardContent>
+                        <div class="d-flex flex-column gap-4"><h5>Propozycje fiszek</h5></div>
+                        </MudCardContent>
+                </MudCard>                             
+
+                for (int i = 0; i < _model.Cards.Count; i++)
+                {
+                    var index = i;
+                    <MudCard Class="mb-4">
+                        <MudCardContent>
+                            <div class="d-flex flex-column gap-4">                                
+                                <MudTextField T="string"
+                                @bind-Value="_model.Cards[index].Front"
+                                Label="@($"Przód fiszki {index + 1}")"
+                                Lines="3"
+                                MaxLength="1000"
+                                Required="true"
+                                RequiredError="Przód fiszki jest wymagany"
+                                Immediate="true"
+                                Variant="Variant.Outlined" />
+
+                                <MudTextField T="string"
+                                @bind-Value="_model.Cards[index].Back"
+                                Label="@($"Tył fiszki {index + 1}")"
+                                Lines="5"
+                                MaxLength="5000"
+                                Required="true"
+                                RequiredError="Tył fiszki jest wymagany"
+                                Immediate="true"
+                                Variant="Variant.Outlined" />
+                            </div>
+                        </MudCardContent>
+                    </MudCard>                   
+                }
+                <MudCard>
+                    <MudCardContent>
+                        <MudButton ButtonType="ButtonType.Button" OnClick="ClearCards"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Secondary"
+                                   Size="Size.Large"
+                                   FullWidth="true"
+                                   Style="text-transform:initial">
+                            Wyczyść propozycje fiszek
+                        </MudButton>
+                    </MudCardContent>
+                </MudCard>
+            }
+
+            <MudButton ButtonType="ButtonType.Submit"
+            Variant="Variant.Filled"
+            Color="Color.Primary"
+            Size="Size.Large"
+            FullWidth="true"
+            Disabled="@_isSubmitting">
+                @if (_isSubmitting)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Generowanie...</MudText>
+                }
+                else
+                {
+                    if (_model.Cards != null && _model.Cards.Any())
+                    {
+                        <MudText>Zapisz fiszki</MudText>
+                    }
+                    else
+                    {
+                        <MudText>Generuj fiszki</MudText>
+                    }                    
+                }
+            </MudButton>
+        </EditForm>      
+    </MudPaper>
+</MudContainer>
+
+
+@code {
+    private class GenerateFormModel
+    {
+        [Required(ErrorMessage = "Treść jest wymagana")]
+        [StringLength(10000, MinimumLength = 1000, 
+            ErrorMessage = "Treść musi mieć od {2} do {1} znaków")]
+        public string? Content { get; set; }
+
+        public List<CardDto>? Cards { get; set; }
+    }
+
+    private bool _isSubmitting;
+    private GenerateFormModel _model = new () { Content = "Katowickie beboki to grupa małych rzeźb plenerowych, które przedstawiają demona z wierzeń słowiańskich – beboka w zróżnicowanych formach i z różnymi atrybutami[1]. Twórcą i pomysłodawcą figurek, której znajdują się w przestrzeni miejskiej Katowic, jest katowicki artysta Grzegorz Chudy[2], którego pracownia znajduje się na terenie Nikiszowca przy ulicy Odrowążów 9/4[3]. Sam autor w swoich pracach przedstawia beboki jako sympatyczne stworki, a pomysł na ich wygląd zaczerpnął z rysunku dla dziecka[1][2].\nBeboki są głównie projektowane na zamówienie, które jest składane przez przedsiębiorców, lokalne społeczności bądź instytucje[2]. Figurki są przez pomysłodawców fundowane samodzielnie bądź też finansowane m.in. ze zbiórek internetowych, czy też ze sprzedaży „cegiełek”. Najpierw bebok powstaje na papierze jako szkic, następnie jako akwarela, po czym następuje odlew figurki i jej umieszczenie w określonym miejscu. Są one tworzone z brązu w zabrzańskiej pracowni, którą prowadzą Dariusz Kik i Karolina Piechota[4].\nFigurki beboków powstają również w formie m.in. magnesów, kartek świątecznych, akwareli, a także jako maskotki wykonywane przez Ewę Kapias ze Stowarzyszenia Rękodzieła „Manufaktura KrysKa Designe”, mającego siedzibę w Katowicach przy ulicy św. Anny[4][5].\nKatowickie beboki stanowią jedną z atrakcji turystycznych Katowic i są porównywane do wrocławskich krasnali[6], czy też do bachusików w Zielonej Górze[7]. Na ich bazie funkcjonuje Katowicki Szlak Beboków, który z założenia ma zachęcać turystów do zwiedzania miasta[8]. Organizatorzy umożliwili m.in. zbieranie stempli, za które jest możliwość otrzymania odznaki łowcy beboków[9].\nMieszkańcy miasta i instytucje opiekujące się figurkami przy różnych okazjach przebierają niektóre beboki w stroje, np. ciepłe ubrania, kostiumy halloweenowe czy akcesoria informujące o akcjach społecznych[10][11]." };
+
+    private async Task HandleValidSubmit()
+    {
+        if (_isSubmitting) return;
+
+        _isSubmitting = true;
+        try
+        {
+            if (_model.Cards == null || !_model.Cards.Any())
+            {
+                await GenerateFishcards();
+            }
+            else
+            {
+                await SaveContentAndCards();
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Wystąpił błąd: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+    private async Task ClearCards()
+    {
+        _model.Cards = null;
+        StateHasChanged();
+    }
+
+    private async Task GenerateFishcards()
+    {
+        var command = new GenerateCardCommand { OriginalContent = _model.Content! };
+        var json = System.Text.Json.JsonSerializer.Serialize(command);
+        var response = await Http.PostAsJsonAsync("/api/cards/generate", command);
+
+        if (response.IsSuccessStatusCode)
+        {
+            _model.Cards = await response.Content.ReadFromJsonAsync<List<CardDto>>();            
+            Snackbar.Add("Fiszka została wygenerowana pomyślnie", Severity.Success);
+            StateHasChanged();
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            Snackbar.Add($"Błąd generowania fiszki: {error}", Severity.Error);
+        }
+    }
+
+    private async Task SaveContentAndCards()
+    {
+        if (_model == null || 
+            string.IsNullOrEmpty(_model.Content) ||
+            _model.Cards == null || !_model.Cards.Any()) return;
+
+        try
+        {
+            //original content save
+            var originalContent = new CreateOriginalContentCommand
+                {
+                    Content = _model.Content!
+                };
+
+            var originalContentResponse = await Http.PostAsJsonAsync("/api/originalcontents", originalContent);
+            if (!originalContentResponse.IsSuccessStatusCode)
+            {
+                var error = await originalContentResponse.Content.ReadAsStringAsync();
+                Snackbar.Add($"Błąd zapisywania treści oryginalnej: {error}", Severity.Error);
+                return;
+            }
+
+            var savedContent = await originalContentResponse.Content.ReadFromJsonAsync<OriginalContentDto>();
+            if (savedContent == null || savedContent.Id == 0)
+            {
+                Snackbar.Add("Nie udało się zapisać treści oryginalnej", Severity.Error);
+                return;
+            }
+
+            Snackbar.Add("Treść oryginalna została zapisana pomyślnie", Severity.Success);
+
+
+            //fishcard save
+            var successCount = 0;
+            var failureCount = 0;
+
+            foreach (var card in _model.Cards)
+            {
+                var command = new SaveCardCommand
+                    {
+                        OriginalContentId = savedContent.Id,
+                        Front = card.Front,
+                        Back = card.Back,
+                        GeneratedBy = "AI"
+                    };
+
+                var response = await Http.PostAsJsonAsync("/api/cards", command);
+                if (response.IsSuccessStatusCode)
+                {
+                    successCount++;
+                }
+                else
+                {
+                    failureCount++;
+                    var error = await response.Content.ReadAsStringAsync();
+                    Snackbar.Add($"Błąd zapisywania fiszki {successCount + 1}: {error}", Severity.Warning);
+                }
+            }
+
+            if (successCount > 0)
+            {
+                var message = $"Zapisano pomyślnie {successCount} ";
+                message += successCount == 1 ? "fiszkę" : (successCount < 5 ? "fiszki" : "fiszek");
+                Snackbar.Add(message, Severity.Success);
+            }
+
+            if (failureCount > 0)
+            {
+                var message = $"Nie udało się zapisać {failureCount} ";
+                message += failureCount == 1 ? "fiszki" : (failureCount < 5 ? "fiszki" : "fiszek");
+                Snackbar.Add(message, Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Wystąpił nieoczekiwany błąd: {ex.Message}", Severity.Error);
+        }
+    }
+}
