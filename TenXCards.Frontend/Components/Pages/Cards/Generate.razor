@@ -4,7 +4,6 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
 @using TenXCards.API.Models
-@using TenXCards.Frontend.Components.Cards
 @using MudBlazor
 @using MudBlazor.Utilities
 @inject HttpClient Http
@@ -137,7 +136,7 @@
         {
             if (_model.Cards == null || !_model.Cards.Any())
             {
-                await GenerateFishcards();
+                await GenerateFlashcards();
             }
             else
             {
@@ -161,7 +160,7 @@
         StateHasChanged();
     }
 
-    private async Task GenerateFishcards()
+    private async Task GenerateFlashcards()
     {
         var command = new GenerateCardCommand { OriginalContent = _model.Content! };
         var json = System.Text.Json.JsonSerializer.Serialize(command);
