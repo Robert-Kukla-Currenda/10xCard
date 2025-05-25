@@ -1,0 +1,78 @@
+@using TenXCards.API.Models
+
+<div class="bg-white shadow rounded-lg p-4">
+    <div class="flex justify-between items-start">
+        <div>
+            <div class="text-sm text-gray-500 mb-1">
+                Created @Item.CreatedAt.ToString("MMM dd, yyyy")
+            </div>
+            <div class="text-gray-800 mb-2">
+                @(GetConeten())
+            </div>
+            <button @onclick="ToggleFullLengthContent"
+            class="text-blue-600 hover:text-blue-800">
+                @(isFullLengthContent ? "Show shorten content" : "Show full length content")
+            </button>
+        </div>
+        <button @onclick="ToggleExpanded"
+        class="text-blue-600 hover:text-blue-800">
+            @(isExpanded ? "Hide Cards" : "Show Cards")
+        </button>
+    </div>
+
+    @if (isExpanded)
+    {
+        <div class="mt-4">
+            @if (Item.Cards != null && Item.Cards.Any())
+            {
+                <FlashcardsList Cards="@Item.Cards.ToList()" />
+                @* OnCardDeleted="HandleCardDeleted" /> *@
+            }
+            else
+            {
+                <div class="text-gray-500 text-center py-4">
+                    No cards created yet for this content.
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public required OriginalContentDto Item { get; set; }
+
+    private bool isExpanded;
+    private bool isFullLengthContent = false;
+
+
+    private string GetConeten()
+    {
+        if (isFullLengthContent)
+        {
+            return Item.Content;
+        }
+
+        return GetContentPreview();
+    }
+
+    private string GetContentPreview()
+    {
+        const int previewLength = 150;
+        if (string.IsNullOrEmpty(Item.Content)) return string.Empty;
+
+        return Item.Content.Length <= previewLength 
+            ? Item.Content 
+            : Item.Content[..previewLength] + "...";
+    }
+
+    private void ToggleExpanded()
+    {
+        isExpanded = !isExpanded;
+    }
+
+    private void ToggleFullLengthContent()
+    {
+        isFullLengthContent = !isFullLengthContent;
+    }
+}
