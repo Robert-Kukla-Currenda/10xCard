@@ -4,6 +4,13 @@ This document provides best practices and guidelines for working on backend appl
 
 ---
 
+## Project structure
+
+- Backend - TenXCards.API
+- Frontend - TenXCards.Frontend
+
+---
+
 ## Table of Contents
 
 - Backend Best Practices
