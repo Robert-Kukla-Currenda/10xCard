@@ -7,7 +7,7 @@
             <div class="d-flex justify-space-between align-center">
                 <div>
                     <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mb-1">
-                        Created @Item.CreatedAt.ToString("MMM dd, yyyy")
+                        Utworzono: @Item.CreatedAt.ToString("dd.MM.yyyy")
                     </MudText>
                     <MudText Color="Color.Default" Class="mb-2">
                         @(GetConeten())
@@ -15,13 +15,13 @@
                     <MudButton Variant="Variant.Text" 
                               Color="Color.Primary" 
                               OnClick="ToggleFullLengthContent">
-                        @(isFullLengthContent ? "Show shorten content" : "Show full length content")
+                        @(isFullLengthContent ? "Pokaż skróconą treść" : "Pokaż pełną treść")
                     </MudButton>
                 </div>
                 <MudButton Variant="Variant.Text" 
                           Color="Color.Primary" 
                           OnClick="ToggleExpanded">
-                    @(isExpanded ? "Hide Cards" : "Show Cards")
+                    @(isExpanded ? "Ukryj fiszki" : "Pokaż fiszki")
                 </MudButton>
             </div>
         </MudItem>
@@ -38,7 +38,7 @@
                     <MudText Align="Align.Center" 
                             Color="Color.Secondary" 
                             Class="py-4">
-                        No cards created yet for this content.
+                        Nie utworzono jeszcze żadnych fiszek dla tej treści.
                     </MudText>
                 }
             </MudItem>
@@ -52,7 +52,6 @@
 
     private bool isExpanded;
     private bool isFullLengthContent = false;
-
 
     private string GetConeten()
     {

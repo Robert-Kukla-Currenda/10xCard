@@ -7,19 +7,19 @@
 @inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
-<PageTitle>Dashboard - TenXCards</PageTitle>
+<PageTitle>Panel główny - TenXCards</PageTitle>
 
 <MudContainer Class="pa-4">
     <MudPaper Elevation="3" Class="pa-4">
         <MudGrid>
             <MudItem xs="12">
                 <div class="d-flex justify-space-between align-center">
-                    <MudText Typo="Typo.h4">Dashboard</MudText>
+                    <MudText Typo="Typo.h4">Panel główny</MudText>
                     <MudButton Variant="Variant.Filled" 
                               Color="Color.Primary" 
                               OnClick="NavigateToCreateContent"
                               StartIcon="@Icons.Material.Filled.Add">
-                        Create New Content
+                        Utwórz nową treść
                     </MudButton>
                 </div>
             </MudItem>
@@ -38,7 +38,7 @@
                         <MudButton Variant="Variant.Text" 
                                   Color="Color.Primary" 
                                   OnClick="LoadOriginalContentsAsync">
-                            Try Again
+                            Spróbuj ponownie
                         </MudButton>
                     </MudAlert>
                 </MudItem>
@@ -60,9 +60,9 @@
                         {
                             <MudItem xs="12">
                                 <MudText Align="Align.Center" 
-                                        Class="py-8" 
-                                        Color="Color.Secondary">
-                                    No content found. Create some content to get started!
+                                        Color="Color.Secondary" 
+                                        Class="py-8">
+                                    Brak treści. Utwórz nową treść, aby rozpocząć!
                                 </MudText>
                             </MudItem>
                         }
@@ -118,9 +118,8 @@
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error loading original contents");
-            error = "Failed to load contents. Please try again later.";
-            Snackbar.Add("Failed to load contents. Please try again later.", Severity.Error);
+            Logger.LogError(ex, "Błąd podczas ładowania treści");
+            error = "Nie udało się załadować treści. Spróbuj ponownie później.";
         }
         finally
         {
@@ -137,6 +136,6 @@
     private void NavigateToCreateContent()
     {
         // TODO: Implement navigation to content creation page
-        Snackbar.Add("Navigation to content creation page not implemented yet.", Severity.Info);
+        Snackbar.Add("Przekierowanie do strony tworzenia treści nie zostało jeszcze zaimplementowane.", Severity.Info);
     }
 }
