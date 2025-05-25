@@ -16,9 +16,9 @@
                 <div class="d-flex justify-space-between align-center">
                     <MudText Typo="Typo.h4">Panel główny</MudText>
                     <MudButton Variant="Variant.Filled" 
-                              Color="Color.Primary" 
-                              OnClick="NavigateToCreateContent"
-                              StartIcon="@Icons.Material.Filled.Add">
+                    Color="Color.Primary" 
+                    OnClick="NavigateToCreateContent"
+                    StartIcon="@Icons.Material.Filled.Add">
                         Utwórz nową treść
                     </MudButton>
                 </div>
@@ -36,8 +36,8 @@
                     <MudAlert Severity="Severity.Error" Class="my-2">
                         @error
                         <MudButton Variant="Variant.Text" 
-                                  Color="Color.Primary" 
-                                  OnClick="LoadOriginalContentsAsync">
+                        Color="Color.Primary" 
+                        OnClick="LoadOriginalContentsAsync">
                             Spróbuj ponownie
                         </MudButton>
                     </MudAlert>
@@ -52,7 +52,9 @@
                             foreach (var content in _originalContents)
                             {                        
                                 <MudItem xs="12">
-                                    <OriginalContentItem Item="@content" />
+                                    <OriginalContentItem 
+                                        Item="@content"
+                                        OnDeleted="HandleDeleteContent" />
                                 </MudItem>
                             }
                         }
@@ -60,8 +62,8 @@
                         {
                             <MudItem xs="12">
                                 <MudText Align="Align.Center" 
-                                        Color="Color.Secondary" 
-                                        Class="py-8">
+                                Color="Color.Secondary" 
+                                Class="py-8">
                                     Brak treści. Utwórz nową treść, aby rozpocząć!
                                 </MudText>
                             </MudItem>
@@ -72,8 +74,8 @@
                     {
                         <MudItem xs="12" Class="d-flex justify-center mt-4">
                             <MudPagination Count="@((int)Math.Ceiling(_paginationInfo.TotalCount / (double)_paginationInfo.PageSize))"
-                                         SelectedChanged="HandlePageChange"
-                                         Selected="@_paginationInfo.CurrentPage" />
+                            SelectedChanged="HandlePageChange"
+                            Selected="@_paginationInfo.CurrentPage" />
                         </MudItem>
                     }
                 </MudItem>
@@ -130,6 +132,11 @@
     private async Task HandlePageChange(int newPage)
     {
         _paginationInfo.CurrentPage = newPage;
+        await LoadOriginalContentsAsync();
+    }
+
+    private async Task HandleDeleteContent()
+    {
         await LoadOriginalContentsAsync();
     }
 

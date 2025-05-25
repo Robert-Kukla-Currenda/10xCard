@@ -1,0 +1,27 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudText>@Message</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelDelete">Anuluj</MudButton>
+        <MudButton Color="Color.Error" OnClick="ConfirmDelete">Usuń</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public required string Message { get; set; }
+
+    private void ConfirmDelete()    
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private void CancelDelete()
+    {
+        MudDialog.Cancel();
+    }
+}
