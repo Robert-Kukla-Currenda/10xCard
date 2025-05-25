@@ -1,42 +1,50 @@
 @using TenXCards.API.Models
+@using MudBlazor
 
-<div class="bg-white shadow rounded-lg p-4">
-    <div class="flex justify-between items-start">
-        <div>
-            <div class="text-sm text-gray-500 mb-1">
-                Created @Item.CreatedAt.ToString("MMM dd, yyyy")
-            </div>
-            <div class="text-gray-800 mb-2">
-                @(GetConeten())
-            </div>
-            <button @onclick="ToggleFullLengthContent"
-            class="text-blue-600 hover:text-blue-800">
-                @(isFullLengthContent ? "Show shorten content" : "Show full length content")
-            </button>
-        </div>
-        <button @onclick="ToggleExpanded"
-        class="text-blue-600 hover:text-blue-800">
-            @(isExpanded ? "Hide Cards" : "Show Cards")
-        </button>
-    </div>
-
-    @if (isExpanded)
-    {
-        <div class="mt-4">
-            @if (Item.Cards != null && Item.Cards.Any())
-            {
-                <FlashcardsList Cards="@Item.Cards.ToList()" />
-                @* OnCardDeleted="HandleCardDeleted" /> *@
-            }
-            else
-            {
-                <div class="text-gray-500 text-center py-4">
-                    No cards created yet for this content.
+<MudPaper Elevation="2" Class="pa-4 mb-4">
+    <MudGrid>
+        <MudItem xs="12">
+            <div class="d-flex justify-space-between align-center">
+                <div>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mb-1">
+                        Created @Item.CreatedAt.ToString("MMM dd, yyyy")
+                    </MudText>
+                    <MudText Color="Color.Default" Class="mb-2">
+                        @(GetConeten())
+                    </MudText>
+                    <MudButton Variant="Variant.Text" 
+                              Color="Color.Primary" 
+                              OnClick="ToggleFullLengthContent">
+                        @(isFullLengthContent ? "Show shorten content" : "Show full length content")
+                    </MudButton>
                 </div>
-            }
-        </div>
-    }
-</div>
+                <MudButton Variant="Variant.Text" 
+                          Color="Color.Primary" 
+                          OnClick="ToggleExpanded">
+                    @(isExpanded ? "Hide Cards" : "Show Cards")
+                </MudButton>
+            </div>
+        </MudItem>
+
+        @if (isExpanded)
+        {
+            <MudItem xs="12" Class="mt-4">
+                @if (Item.Cards != null && Item.Cards.Any())
+                {
+                    <FlashcardsList Cards="@Item.Cards.ToList()" />
+                }
+                else
+                {
+                    <MudText Align="Align.Center" 
+                            Color="Color.Secondary" 
+                            Class="py-4">
+                        No cards created yet for this content.
+                    </MudText>
+                }
+            </MudItem>
+        }
+    </MudGrid>
+</MudPaper>
 
 @code {
     [Parameter]

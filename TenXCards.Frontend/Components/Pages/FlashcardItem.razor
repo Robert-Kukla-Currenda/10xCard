@@ -1,37 +1,41 @@
 ﻿@using TenXCards.API.Models
+@using MudBlazor
 
-<div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-    <div class="flex justify-between items-start">
-        <div class="flex-1">
-            <div class="text-sm text-gray-600 mb-1">
-                Created: @Card.CreatedAt.ToString("MMM dd, yyyy")
-                <span class="ml-2 px-2 py-0.5 rounded text-xs
-                           @(Card.GeneratedBy == "AI" ? "bg-purple-100 text-purple-800" : "bg-green-100 text-green-800")">
-                    @Card.GeneratedBy
-                </span>
+<MudPaper Elevation="1" Class="pa-4">
+    <MudGrid>
+        <MudItem xs="12">
+            <div class="d-flex justify-space-between align-center">
+                <div class="flex-grow-1">
+                    <div class="d-flex align-center mb-2">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            Created: @Card.CreatedAt.ToString("MMM dd, yyyy")
+                        </MudText>
+                        <MudText Typo="Typo.caption" 
+                                Color="@(Card.GeneratedBy == "AI" ? Color.Secondary : Color.Success)"
+                                Class="ml-2 px-2 py-1 rounded mud-background-gray">
+                            @Card.GeneratedBy
+                        </MudText>
+                    </div>
+
+                    <MudText>
+                        @(GetFrontPreview())
+                    </MudText>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                 Color="Color.Primary"
+                                 Size="Size.Small"
+                                 OnClick="() => OnEdit.InvokeAsync(Card)" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                 Color="Color.Error"
+                                 Size="Size.Small"
+                                 OnClick="() => OnDelete.InvokeAsync(Card)" />
+                </div>
             </div>
-
-            <div class="text-gray-800">
-                @(GetFrontPreview())
-            </div>
-        </div>
-
-        <div class="flex space-x-2 ml-4">
-            <button @onclick="() => OnEdit.InvokeAsync(Card)"
-                    class="text-blue-600 hover:text-blue-800">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-            </button>
-            <button @onclick="() => OnDelete.InvokeAsync(Card)"
-                    class="text-red-600 hover:text-red-800">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-            </button>
-        </div>
-    </div>
-</div>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
 
 @code {
     [Parameter]

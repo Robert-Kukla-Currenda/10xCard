@@ -1,79 +1,86 @@
 @page "/dashboard"
 @using TenXCards.API.Models
 @using TenXCards.Frontend.Models
+@using MudBlazor
 @inject HttpClient Http
 @inject ILogger<Dashboard> Logger
+@inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
-<div class="container mx-auto p-4">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Dashboard</h1>
-        <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" @onclick="NavigateToCreateContent">
-            Create New Content
-        </button>
-    </div>
+<PageTitle>Dashboard - TenXCards</PageTitle>
 
-    @if (isLoading)
-    {
-        <div class="flex justify-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-blue-500"></div>
-        </div>
-    }
-    else if (error != null)
-    {
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
-            <p>@error</p>
-            <button class="underline" @onclick="LoadOriginalContentsAsync">Try Again</button>
-        </div>
-    }
-    else
-    {
-        <div class="space-y-4">
-            <div class="flex justify-between items-center mb-4">
-                <div class="flex items-center space-x-2">
-                    <label for="sort" class="text-sm font-medium">Sort by:</label>
-                    @* <select id="sort" class="border rounded px-2 py-1" value="@currentSort" @onchange="HandleSortChange"> *@
-                    @*     <option value="createdAt_desc">Newest first</option> *@
-                    @*     <option value="createdAt_asc">Oldest first</option> *@
-                    @* </select> *@
+<MudContainer Class="pa-4">
+    <MudPaper Elevation="3" Class="pa-4">
+        <MudGrid>
+            <MudItem xs="12">
+                <div class="d-flex justify-space-between align-center">
+                    <MudText Typo="Typo.h4">Dashboard</MudText>
+                    <MudButton Variant="Variant.Filled" 
+                              Color="Color.Primary" 
+                              OnClick="NavigateToCreateContent"
+                              StartIcon="@Icons.Material.Filled.Add">
+                        Create New Content
+                    </MudButton>
                 </div>
-            </div>
+            </MudItem>
 
-            <div class="space-y-4">
-                @if (_originalContents.Any())
-                {
-                    foreach (var content in _originalContents)
-                    {                        
-                        <OriginalContentItem Item="@content" />
-                    }
-                }
-                else
-                {
-                    <div class="text-gray-500 text-center py-8">
-                        No content found. Create some content to get started!
-                    </div>
-                }
-            </div>
-
-            @if (_paginationInfo.TotalCount > 0)
+            @if (isLoading)
             {
-                <div class="flex justify-center mt-4 space-x-2">
-                    @{
-                        var totalPages = (int)Math.Ceiling(_paginationInfo.TotalCount / (double)_paginationInfo.PageSize);
-                        for (var i = 1; i <= totalPages; i++)
-                        {
-                            var pageNumber = i;                            
-                            <button class="@(pageNumber == _paginationInfo.CurrentPage ? "bg-blue-600 text-white" : "bg-gray-200") 
-                                                           px-3 py-1 rounded" @onclick="() => HandlePageChange(pageNumber)">
-                                @i
-                            </button>
-                        }
-                    }
-                </div>
+                <MudItem xs="12" Class="d-flex justify-center">
+                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                </MudItem>
             }
-        </div>
-    }
-</div>
+            else if (error != null)
+            {
+                <MudItem xs="12">
+                    <MudAlert Severity="Severity.Error" Class="my-2">
+                        @error
+                        <MudButton Variant="Variant.Text" 
+                                  Color="Color.Primary" 
+                                  OnClick="LoadOriginalContentsAsync">
+                            Try Again
+                        </MudButton>
+                    </MudAlert>
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="12">
+                    <MudGrid>
+                        @if (_originalContents.Any())
+                        {
+                            foreach (var content in _originalContents)
+                            {                        
+                                <MudItem xs="12">
+                                    <OriginalContentItem Item="@content" />
+                                </MudItem>
+                            }
+                        }
+                        else
+                        {
+                            <MudItem xs="12">
+                                <MudText Align="Align.Center" 
+                                        Class="py-8" 
+                                        Color="Color.Secondary">
+                                    No content found. Create some content to get started!
+                                </MudText>
+                            </MudItem>
+                        }
+                    </MudGrid>
+
+                    @if (_paginationInfo.TotalCount > 0)
+                    {
+                        <MudItem xs="12" Class="d-flex justify-center mt-4">
+                            <MudPagination Count="@((int)Math.Ceiling(_paginationInfo.TotalCount / (double)_paginationInfo.PageSize))"
+                                         SelectedChanged="HandlePageChange"
+                                         Selected="@_paginationInfo.CurrentPage" />
+                        </MudItem>
+                    }
+                </MudItem>
+            }
+        </MudGrid>
+    </MudPaper>
+</MudContainer>
 
 @code {
     private List<OriginalContentDto> _originalContents = new();
@@ -86,7 +93,6 @@
         public int CurrentPage { get; set; } = 1;
         public int PageSize { get; set; } = 2;
         public int TotalCount { get; set; }
-        //public string SortOrder { get; set; } = "createdAt_desc";
     }
 
     protected override async Task OnInitializedAsync()
@@ -101,7 +107,7 @@
             isLoading = true;
             error = null;
 
-            var query = $"page={_paginationInfo.CurrentPage}&limit={_paginationInfo.PageSize}"; // &sort={_paginationInfo.SortOrder}";
+            var query = $"page={_paginationInfo.CurrentPage}&limit={_paginationInfo.PageSize}";
             var response = await Http.GetFromJsonAsync<PaginationResult<OriginalContentDto>>($"api/originalcontents?{query}");
 
             if (response != null)
@@ -114,6 +120,7 @@
         {
             Logger.LogError(ex, "Error loading original contents");
             error = "Failed to load contents. Please try again later.";
+            Snackbar.Add("Failed to load contents. Please try again later.", Severity.Error);
         }
         finally
         {
@@ -127,15 +134,9 @@
         await LoadOriginalContentsAsync();
     }
 
-    // private async Task HandleSortChange(string newSortOrder)
-    // {
-    //     _paginationInfo.SortOrder = newSortOrder;
-    //     _paginationInfo.CurrentPage = 1; Reset to first page when changing sort
-    //     await LoadOriginalContentsAsync();
-    // }
-
     private void NavigateToCreateContent()
     {
         // TODO: Implement navigation to content creation page
+        Snackbar.Add("Navigation to content creation page not implemented yet.", Severity.Info);
     }
 }
