@@ -200,6 +200,7 @@ public class CardService : ICardService
 
             card.Front = command.Front;
             card.Back = command.Back;
+            card.GeneratedBy = command.GeneratedBy;
             //card.UpdatedAt = DateTime.UtcNow;
 
             await _dbContext.SaveChangesAsync();

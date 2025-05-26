@@ -104,6 +104,11 @@ namespace TenXCards.API.Models
     /// </summary>
     public class UpdateCardCommand
     {
+        // Possible values: "AI" or "human"
+        [Required]
+        [StringLength(10)]
+        public required string GeneratedBy { get; set; } = default!;
+
         [Required]
         [StringLength(1000, MinimumLength = 1)]
         public string Front { get; set; } = default!;
