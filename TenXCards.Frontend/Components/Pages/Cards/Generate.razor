@@ -37,9 +37,9 @@
             @if (_model.Cards != null && _model.Cards.Any())
             {                
                 <MudCard Class="mb-4">
-                        <MudCardContent>
-                        <div class="d-flex flex-column gap-4"><h5>Propozycje fiszek</h5></div>
-                        </MudCardContent>
+                    <MudCardContent>
+                        <div class="d-flex flex-column gap-4"><h5>Fiszki</h5></div>
+                    </MudCardContent>
                 </MudCard>                             
 
                 for (int i = 0; i < _model.Cards.Count; i++)
@@ -47,6 +47,19 @@
                     var index = i;
                     <MudCard Class="mb-4">
                         <MudCardContent>
+                            <MudText Typo="Typo.caption"
+                            Color="@(_model.Cards[index].GeneratedBy == "AI" ? Color.Secondary : Color.Success)"
+                            Class="ml-2 px-2 py-1">
+                                @if (_model.Cards[index].GeneratedBy == "AI")
+                                {
+                                    <MudIcon Icon="@Icons.Material.Filled.AutoAwesome" Title="Fiszka wygenerowana AI" />
+                                }
+                                else
+                                {
+                                    <MudIcon Icon="@Icons.Material.Filled.Person" Title="Fiszka użytkownika" />
+                                }
+                            </MudText>
+
                             <div class="d-flex flex-column gap-4">                                
                                 <MudTextField T="string"
                                 @bind-Value="_model.Cards[index].Front"
@@ -73,41 +86,54 @@
                 }
                 <MudCard>
                     <MudCardContent>
-                        <MudButton ButtonType="ButtonType.Button" OnClick="ClearCards"
-                                   Variant="Variant.Filled"
-                                   Color="Color.Secondary"
-                                   Size="Size.Large"
-                                   FullWidth="true"
-                                   Style="text-transform:initial">
-                            Wyczyść propozycje fiszek
+                        <MudButton ButtonType="ButtonType.Button" OnClick="GenerateOrClearFlascards"
+                            Variant="Variant.Filled"
+                            Color="Color.Warning"
+                            Size="Size.Large"
+                            FullWidth="true"
+                            Style="text-transform:initial"
+                            Disabled="@_isSubmitting">
+                            @(_model.Cards == null || !_model.Cards.Any() || !IsAnyFlascardGeneratedByAI()? "Wygeneruj fiszki przez AI" : "Wyczyść propozycje fiszek AI")                            
                         </MudButton>
                     </MudCardContent>
                 </MudCard>
             }
 
-            <MudButton ButtonType="ButtonType.Submit"
-            Variant="Variant.Filled"
-            Color="Color.Primary"
-            Size="Size.Large"
-            FullWidth="true"
-            Disabled="@_isSubmitting">
-                @if (_isSubmitting)
-                {
-                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-                    <MudText Class="ms-2">Generowanie...</MudText>
-                }
-                else
-                {
-                    if (_model.Cards != null && _model.Cards.Any())
+            <div class="d-flex gap-3 mt-3">
+                <MudButton ButtonType="ButtonType.Submit"
+                    Variant="Variant.Filled"
+                    Color="Color.Primary"
+                    Size="Size.Large"
+                    Class="flex-grow-1"
+                    Disabled="@_isSubmitting">
+                    @if (_isSubmitting)
                     {
-                        <MudText>Zapisz fiszki</MudText>
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                        <MudText Class="ms-2">Generowanie...</MudText>
                     }
                     else
                     {
-                        <MudText>Generuj fiszki</MudText>
-                    }                    
-                }
-            </MudButton>
+                        if (_model.Cards != null && _model.Cards.Any())
+                        {
+                            <MudText>Zapisz fiszki</MudText>
+                        }
+                        else
+                        {
+                            <MudText><MudIcon Icon="@Icons.Material.Filled.AutoAwesome" Title="AI" /> Generuj fiszki przez AI</MudText>
+                        }
+                    }
+                </MudButton>
+
+                <MudButton ButtonType="ButtonType.Button"
+                    Variant="Variant.Filled"
+                    Color="Color.Secondary"
+                    Size="Size.Large"
+                    Class="flex-grow-1"
+                    Disabled="@_isSubmitting"
+                    OnClick="AddFlashcard">
+                    <MudText><MudIcon Icon="@Icons.Material.Filled.Person" Title="Fiszka wygenerowana AI" /> Dodaj własną fiszkę</MudText>
+                </MudButton>
+            </div>
         </EditForm>      
     </MudPaper>
 </MudContainer>
@@ -154,9 +180,40 @@
         }
     }
 
-    private async Task ClearCards()
+    private async Task GenerateOrClearFlascards()
     {
-        _model.Cards = null;
+        if (_isSubmitting) return;
+        
+        try
+        {            
+            _isSubmitting = true;
+            if (_model.Cards == null || !_model.Cards.Any() || !IsAnyFlascardGeneratedByAI())
+            {
+                await GenerateFlashcards();
+            }
+            else
+            {
+                ClearAICards();
+            }
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+        
+    }
+
+    private void ClearAICards()
+    {      
+        if (_model.Cards == null) return;
+
+        _model.Cards = _model.Cards.Where(card => card.GeneratedBy != "AI").ToList();
+
+        if (!_model.Cards.Any())
+        {
+            _model.Cards = null;
+        }
+
         StateHasChanged();
     }
 
@@ -168,7 +225,19 @@
 
         if (response.IsSuccessStatusCode)
         {
-            _model.Cards = await response.Content.ReadFromJsonAsync<List<CardDto>>();            
+            var aiCards = await response.Content.ReadFromJsonAsync<List<CardDto>>();
+            if (aiCards == null || !aiCards.Any())
+            {
+                Snackbar.Add("Nie udało się wygenerować fiszek", Severity.Warning);
+                return;
+            }
+
+            if (_model.Cards == null)
+            {
+                _model.Cards = new List<CardDto>();
+            }
+            _model.Cards.AddRange(aiCards);
+
             Snackbar.Add("Fiszka została wygenerowana pomyślnie", Severity.Success);
             StateHasChanged();
         }
@@ -177,6 +246,22 @@
             var error = await response.Content.ReadAsStringAsync();
             Snackbar.Add($"Błąd generowania fiszki: {error}", Severity.Error);
         }
+    }
+
+    private void AddFlashcard()
+    {
+        if (_model.Cards == null)
+        {
+            _model.Cards = new List<CardDto>();
+        }
+        var newCard = new CardDto
+        {
+            GeneratedBy = "human",
+            Front = string.Empty,
+            Back = string.Empty
+        };
+        _model.Cards.Add(newCard);
+        StateHasChanged();
     }
 
     private async Task SaveContentAndCards()
@@ -222,7 +307,7 @@
                         OriginalContentId = savedContent.Id,
                         Front = card.Front,
                         Back = card.Back,
-                        GeneratedBy = "AI"
+                        GeneratedBy = card.GeneratedBy
                     };
 
                 var response = await Http.PostAsJsonAsync("/api/cards", command);
@@ -256,5 +341,12 @@
         {
             Snackbar.Add($"Wystąpił nieoczekiwany błąd: {ex.Message}", Severity.Error);
         }
+    }
+
+    private bool IsAnyFlascardGeneratedByAI()
+    {
+        if (_model.Cards == null) return false;
+
+        return _model.Cards.Where(card => card.GeneratedBy == "AI").Count() > 0;
     }
 }

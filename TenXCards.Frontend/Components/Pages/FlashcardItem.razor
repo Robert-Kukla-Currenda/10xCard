@@ -18,9 +18,16 @@
                                 Utworzono: @Card.CreatedAt.ToString("dd.MM.yyyy")
                             </MudText>
                             <MudText Typo="Typo.caption" 
-                            Color="@(Card.GeneratedBy == "AI" ? Color.Secondary : Color.Success)"
-                            Class="ml-2 px-2 py-1 rounded mud-background-gray">
-                                @(Card.GeneratedBy == "AI" ? "Sztuczna inteligencja" : "Użytkownik")
+                                Color="@(Card.GeneratedBy == "AI" ? Color.Secondary : Color.Success)"
+                                Class="ml-2 px-2 py-1">
+                                @if (Card.GeneratedBy == "AI")
+                                {
+                                    <MudIcon Icon="@Icons.Material.Filled.AutoAwesome" Title="Fiszka wygenerowana AI" />
+                                }
+                                else
+                                {
+                                    <MudIcon Icon="@Icons.Material.Filled.Person" Title="Fiszka użytkownika" />
+                                }                                
                             </MudText>
                         </div>
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
