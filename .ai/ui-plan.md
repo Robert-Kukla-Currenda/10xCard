@@ -19,6 +19,13 @@ Interfejs użytkownika MVP zostaje podzielony na kilka kluczowych widoków: ekra
   - **Kluczowe komponenty widoku:** Formularz rejestracji, przycisk "Zarejestruj się", dynamiczna walidacja inline.
   - **UX, dostępność i względy bezpieczeństwa:** Intuicyjny formularz, jasne komunikaty błędów (toast notifications) oraz bezpieczeństwo danych zgodnie z wymaganiami.
 
+- **Ekran informacji o użytkowniku**
+  - **Ścieżka widoku:** `/user/info`
+  - **Główny cel:** Wyświetlenie szczegółowych danych konta użytkownika.
+  - **Kluczowe informacje do wyświetlenia:** Imię, nazwisko, adres email, data utworzenia.
+  - **Kluczowe komponenty widoku:** Panel lub karta prezentująca dane użytkownika, tylko do odczytu.
+  - **UX, dostępność i względy bezpieczeństwa:** Przejrzysty układ, brak możliwości edycji, odpowiednie zabezpieczenia przy wyświetlaniu danych.
+
 - **Dashboard (lista fiszek)**
   - **Ścieżka widoku:** `/dashboard`
   - **Główny cel:** Prezentacja listy treści źródłowych, z których zostały wygenerowane fiszki, oraz umożliwienie przeglądania powiązanych fiszek.
@@ -28,27 +35,23 @@ Interfejs użytkownika MVP zostaje podzielony na kilka kluczowych widoków: ekra
   - **Kluczowe komponenty widoku:** Komponent listy treści z rozwijalnymi sekcjami prezentującymi powiązane fiszki oraz przyciski umożliwiające przejście do edycji/detalów.
   - **UX, dostępność i względy bezpieczeństwa:** Intuicyjna nawigacja między treściami i powiązanymi fiszkami, dynamiczne ładowanie na żądanie oraz możliwość sortowania i filtrowania (domyślnie sortowanie od najnowszych).
 
-- **Ekran tworzenia fiszek**
-  - **Ścieżka widoku:** `/cards/generate`
-  - **Główny cel:** Umożliwienie generacji fiszki przy użyciu AI lub ręcznie na podstawie wprowadzonego tekstu.
+- **Modal tworzenia/dodawania fiszki do istniejącej treści**
+  - **Lokalizacja w interfejsie:** Implementowany jako modal na widoku `/dashboard`
+  - **Główny cel:** Umożliwienie ręcznego dodania fiszki do treści, wywoływanych bezpośrednio z dashboardu.
   - **Kluczowe informacje do wyświetlenia:** 
-    - Pole tekstowe do wprowadzenia treści źródłowej (1000–10000 znaków),
-    - Generowanie automatyczne za pomocą przycisku generuj,
-    - Tworzenie manualme, za pomocą przycisku "Dodaj nową fiszkę",
-    - Pola wyświetlające wygenerowany front i tył fiszki,
-    - Dodanie nowej fiszki skutkuje podpięcie jej do tresci, na podstawie której została wygenerowana,
-    - Informacja o możliwości dodawania wielu fiszek do jednej treści.
-  - **Kluczowe komponenty widoku:** Formularz generowania – pole do wprowadzenia treści, przycisk "Generuj" (dla AI) lub interfejs do manualnego wprowadzania danych, przycisk "Zapisz" do zatwierdzenia fiszki, dynamiczna aktualizacja pola.
-  - **UX, dostępność i względy bezpieczeństwa:** Intuicyjna obsługa z możliwością wyboru metody generacji, dynamiczna walidacja inline oraz informowanie użytkownika o błędach poprzez toast notifications.
+    - Pola tekstowe do wprowadzenia fiszki. Front - maksymalnie 1000 znaków, back - maksymalnie 5000 znaków,    
+    - Informacja o możliwości dodania wielu fiszek do jednej treści.
+  - **Kluczowe komponenty widoku:** Formularz dodawania fiszki jako modal, z dynamiczną aktualizacją pól i przyciskiem "Zapisz".
+  - **UX, dostępność i względy bezpieczeństwa:** Intuicyjna obsługa z natychmiastową walidacją inline i komunikatami błędów (toast notifications), dostępna w ramach dashboardu.
 
-- **Ekran edycji fiszki**
-  - **Ścieżka widoku:** `/cards/edit/{id}`
-  - **Główny cel:** Umożliwienie edycji już zapisanej fiszki.
-  - **Kluczowe informacje do wyświetlenia:** Obecne wartości pól fiszki (front, back) umożliwiające użytkownikowi modyfikację.
-  - **Kluczowe komponenty widoku:** Formularz edycji, przyciski do zapisywania modyfikacji, dynamiczna walidacja.
-  - **UX, dostępność i względy bezpieczeństwa:** Prosty interfejs umożliwiający natychmiastową edycję z natychmiastową walidacją oraz bezpieczeństwem operacji.
+- **Modal edycji fiszki**
+  - **Lokalizacja w interfejsie:** Wyświetlany jako modal na widoku `/dashboard` po wybraniu fiszki do edycji
+  - **Główny cel:** Umożliwienie edycji zapisanej fiszki, wywoływanego z poziomu dashboardu.
+  - **Kluczowe informacje do wyświetlenia:** Obecne wartości pól fiszki (front, back) do modyfikacji.
+  - **Kluczowe komponenty widoku:** Formularz edycji jako modal z przyciskami zapisania modyfikacji oraz dynamiczną walidacją.
+  - **UX, dostępność i względy bezpieczeństwa:** Prosty, natychmiastowy interfejs edycji z wbudowaną walidacją, dostępny bez opuszczania widoku dashboardu.
 
-- **Ekran logów błędów**
+- **Ekran logów błędów - opcjonalny**
   - **Ścieżka widoku:** `/cards/errors`
   - **Główny cel:** Udostępnienie użytkownikowi możliwości przeglądania logów błędów związanych z generacją fiszek.
   - **Kluczowe informacje do wyświetlenia:** Data powstania błędu oraz oryginalna treść, z domyślnym sortowaniem od najnowszego błędu.

@@ -1,7 +1,7 @@
 # Plan implementacji widoku Dashboard
 
 ## 1. Przegląd
-Widok **Dashboard** służy do prezentacji listy treści źródłowych oraz zagnieżdżonych pod nimi fiszek. Umożliwia przeglądanie, edycję i usuwanie fiszek w sposób intuicyjny i zgodny z wymaganiami dotyczącymi zarządzania materiałami edukacyjnymi.
+Widok **Dashboard** służy do prezentacji listy treści źródłowych oraz zagnieżdżonych pod nimi fiszek. Umożliwia przeglądanie, dodawniae, edycję i usuwanie fiszek w sposób intuicyjny i zgodny z wymaganiami dotyczącymi zarządzania materiałami edukacyjnymi.
 
 ## 2. Routing widoku
 Widok będzie dostępny pod ścieżką:
@@ -53,7 +53,9 @@ DashboardView
   - Nagłówek z kluczowymi danymi (np. fragment tekstu źródłowego, data).  
   - Sekcja przechowująca listę fiszek.
 - **Obsługiwane interakcje:**  
-  - Rozwijanie lub zwijanie sekcji z fiszkami.  
+  - Rozwijanie lub zwijanie sekcji z fiszkami. 
+  - Dodawanie nowej fiszki do treści.
+  - Usuwanie treści wraz z powiązanymi fiszkami.
   - Możliwość przejścia do edycji treści (opcjonalnie).
 - **Warunki walidacji:** Brak dodatkowych – walidacja danych występuje poza zakresem komponentu.
 - **Typy:** `OriginalContentDto` z polami identyfikującymi treść i listę fiszek.
