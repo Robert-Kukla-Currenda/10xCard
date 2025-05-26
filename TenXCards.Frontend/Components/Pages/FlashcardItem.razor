@@ -3,6 +3,7 @@
 @using MudBlazor
 @using MudBlazor.Utilities
 @using Microsoft.AspNetCore.Components
+@using TenXCards.Frontend.Components.Pages.Cards
 @inject IDialogService DialogService
 @inject HttpClient Http
 @inject ISnackbar Snackbar
@@ -18,8 +19,8 @@
                                 Utworzono: @Card.CreatedAt.ToString("dd.MM.yyyy")
                             </MudText>
                             <MudText Typo="Typo.caption" 
-                                Color="@(Card.GeneratedBy == "AI" ? Color.Secondary : Color.Success)"
-                                Class="ml-2 px-2 py-1">
+                            Color="@(Card.GeneratedBy == "AI" ? Color.Secondary : Color.Success)"
+                            Class="ml-2 px-2 py-1">
                                 @if (Card.GeneratedBy == "AI")
                                 {
                                     <MudIcon Icon="@Icons.Material.Filled.AutoAwesome" Title="Fiszka wygenerowana AI" />
@@ -31,15 +32,15 @@
                             </MudText>
                         </div>
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                                       Color="Color.Primary"
-                                       Size="Size.Small"
-                                       Title="Edytuj"
-                                       OnClick="() => OnEdit.InvokeAsync(Card)" />
+                        Color="Color.Primary"
+                        Size="Size.Small"
+                        Title="Edytuj"
+                        OnClick="OpenEditCardDialog" />
                         <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                       Color="Color.Error"
-                                       Size="Size.Small"
-                                       Title="Usuń"
-                                       OnClick="OpenDeleteDialog" />
+                        Color="Color.Error"
+                        Size="Size.Small"
+                        Title="Usuń"
+                        OnClick="OpenDeleteDialog" />
                     </div>
 
                     <div class="d-flex flex-column gap-4">
@@ -70,10 +71,13 @@
 
 @code {
     [Parameter]
+    public required int OriginalContentId { get; set; }
+
+    [Parameter]
     public required CardDto Card { get; set; }
 
     [Parameter]
-    public EventCallback<CardDto> OnEdit { get; set; }
+    public EventCallback OnEdit { get; set; }
 
     [Parameter]
     public EventCallback OnDelete { get; set; }
@@ -103,7 +107,10 @@
 
             if (response.IsSuccessStatusCode)
             {
-                await OnDelete.InvokeAsync();
+                if (OnDelete.HasDelegate)
+                {
+                    await OnDelete.InvokeAsync();
+                }
                 Snackbar.Add("Fiszka została usunięta", Severity.Success);
             }
             else
@@ -119,6 +126,24 @@
         finally
         {
             isDeleting = false;
+        }
+    }
+
+    private async Task OpenEditCardDialog()
+    {
+        var parameters = new DialogParameters
+        {
+            { nameof(CreateEditFlashcardModal.OriginalContentId), OriginalContentId },
+            { nameof(CreateEditFlashcardModal.Card), Card }
+        };
+        var dialog = await DialogService.ShowAsync<CreateEditFlashcardModal>("Edytuj fiszkę", parameters);
+        var result = await dialog.Result;
+        if (result != null && !result.Canceled)
+        {
+            if (OnEdit.HasDelegate)
+            {
+                await OnEdit.InvokeAsync();
+            }
         }
     }
 }

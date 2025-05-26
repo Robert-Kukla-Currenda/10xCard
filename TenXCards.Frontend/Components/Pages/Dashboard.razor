@@ -54,7 +54,8 @@
                                 <MudItem xs="12">
                                     <OriginalContentItem 
                                         Item="@content"
-                                        OnDeleted="HandleDeleteContent" />
+                                        OnDeleted="HandleDeleteContent"
+                                        OnCreateOrEdit="HandleCreateOrEdit" />
                                 </MudItem>
                             }
                         }
@@ -136,6 +137,11 @@
     }
 
     private async Task HandleDeleteContent()
+    {
+        await LoadOriginalContentsAsync();
+    }
+
+    private async Task HandleCreateOrEdit()
     {
         await LoadOriginalContentsAsync();
     }

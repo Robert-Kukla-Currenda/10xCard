@@ -1,6 +1,7 @@
 @using MudBlazor
 @using TenXCards.API.Models
 @using TenXCards.Frontend.Components.Dialogs
+@using TenXCards.Frontend.Components.Pages.Cards
 @inject HttpClient Http
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
@@ -28,7 +29,8 @@
                     <MudIconButton Icon="@Icons.Material.Filled.Add"
                     Color="Color.Success"
                     Size="Size.Small" 
-                    title="Dodaj fiszkę" />
+                    Title="Dodaj fiszkę"
+                    OnClick="OpenCreateCardDialog" />
                     <MudIconButton Icon="@Icons.Material.Filled.Delete"
                     Color="Color.Error"
                     OnClick="OpenDeleteDialog"
@@ -55,8 +57,10 @@
             <MudItem xs="12" Class="mt-4">
                 @if (Item.Cards != null && Item.Cards.Any())
                 {
-                    <FlashcardsList Cards="@Item.Cards.ToList()"
-                                    OnDeleted="OnDeleteCard"/>
+                    <FlashcardsList OriginalContentId="@Item.Id"
+                                    Cards="@Item.Cards.ToList()"
+                                    OnDeleted="OnDeleteCard"
+                                    OnEdit="OnCreateOrEditCard" />
                 }
                 else
                 {
@@ -77,6 +81,9 @@
 
     [Parameter]
     public EventCallback OnDeleted { get; set; }
+
+    [Parameter]
+    public EventCallback OnCreateOrEdit { get; set; }
 
     private bool isExpanded;
     private bool isFullLengthContent = false;
@@ -134,8 +141,8 @@
             var response = await Http.DeleteAsync($"/api/originalcontents/{Item.Id}");
 
             if (response.IsSuccessStatusCode)
-            {                
-                await OnDeleted.InvokeAsync();
+            {
+                await OnDeleteCard();
                 Snackbar.Add("Treść została usunięta", Severity.Success);
             }
             else
@@ -160,5 +167,27 @@
         {
             await OnDeleted.InvokeAsync();
         }
+    }
+
+    private async Task OpenCreateCardDialog()
+    {
+        var parameters = new DialogParameters
+        {
+            { nameof(CreateEditFlashcardModal.OriginalContentId), Item.Id }
+        };
+        var dialog = await DialogService.ShowAsync<CreateEditFlashcardModal>("Dodaj nową fiszkę", parameters);
+        var result = await dialog.Result;
+        if (result != null && !result.Canceled)
+        {
+            await OnCreateOrEditCard();
+        }
+    }
+
+    private async Task OnCreateOrEditCard()
+    {
+        if (OnCreateOrEdit.HasDelegate)
+        {
+            await OnCreateOrEdit.InvokeAsync();
+        }        
     }
 }

@@ -5,18 +5,26 @@
     @foreach (var card in Cards)
     {        
         <MudItem xs="12">
-            <FlashcardItem Card="@card"
-                           OnDelete="OnDeletedCard" />
+            <FlashcardItem OriginalContentId="@OriginalContentId"
+                           Card="@card"
+                           OnDelete="OnDeletedCard" 
+                           OnEdit="OnEditCard"/>
         </MudItem>
     }
 </MudGrid>
 
 @code {
     [Parameter]
+    public required int OriginalContentId { get; set; }
+    
+    [Parameter]
     public required List<CardDto> Cards { get; set; }
 
     [Parameter]
     public EventCallback OnDeleted { get; set; }
+
+    [Parameter]
+    public EventCallback OnEdit { get; set; }
 
     private async Task OnDeletedCard()
     {
@@ -26,23 +34,11 @@
         }
     }
 
-    // private CardDto? cardToDelete;
-    // private CardDto? cardToEdit;
-    // private bool showEditModal;
-
-    // private void HandleEdit(CardDto card)
-    // {
-    //     cardToEdit = card;
-    //     showEditModal = true;
-    // }
-
-    // private void HandleCardUpdated(CardDto updatedCard)
-    // {
-    //     var index = Cards.FindIndex(c => c.Id == updatedCard.Id);
-    //     if (index != -1)
-    //     {
-    //         Cards[index] = updatedCard;
-    //         StateHasChanged();
-    //     }
-    // }
+    private async Task OnEditCard()
+    {
+        if (OnEdit.HasDelegate)
+        {
+            await OnEdit.InvokeAsync();
+        }
+    }
 }
