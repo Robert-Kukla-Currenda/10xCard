@@ -1,7 +1,11 @@
 ﻿@using TenXCards.API.Models
+@using TenXCards.Frontend.Components.Dialogs
 @using MudBlazor
 @using MudBlazor.Utilities
 @using Microsoft.AspNetCore.Components
+@inject IDialogService DialogService
+@inject HttpClient Http
+@inject ISnackbar Snackbar
 
 <MudPaper Elevation="1" Class="pa-4">
     <MudGrid>
@@ -14,8 +18,8 @@
                                 Utworzono: @Card.CreatedAt.ToString("dd.MM.yyyy")
                             </MudText>
                             <MudText Typo="Typo.caption" 
-                                    Color="@(Card.GeneratedBy == "AI" ? Color.Secondary : Color.Success)"
-                                    Class="ml-2 px-2 py-1 rounded mud-background-gray">
+                            Color="@(Card.GeneratedBy == "AI" ? Color.Secondary : Color.Success)"
+                            Class="ml-2 px-2 py-1 rounded mud-background-gray">
                                 @(Card.GeneratedBy == "AI" ? "Sztuczna inteligencja" : "Użytkownik")
                             </MudText>
                         </div>
@@ -28,7 +32,7 @@
                                        Color="Color.Error"
                                        Size="Size.Small"
                                        Title="Usuń"
-                                       OnClick="() => OnDelete.InvokeAsync(Card)" />
+                                       OnClick="OpenDeleteDialog" />
                     </div>
 
                     <div class="d-flex flex-column gap-4">
@@ -65,5 +69,49 @@
     public EventCallback<CardDto> OnEdit { get; set; }
 
     [Parameter]
-    public EventCallback<CardDto> OnDelete { get; set; }
+    public EventCallback OnDelete { get; set; }
+
+    private bool isDeleting;
+
+    private async Task OpenDeleteDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters
+        {
+            { "Message", "Czy na pewno chcesz usunąć tę fiszkę?"}
+        };
+        var dialog = DialogService.ShowAsync<DeleteDialog>("Usuwanie fiszki", parameters);
+
+        await DeleteFlashcard();
+    }
+
+    private async Task DeleteFlashcard()
+    {
+        if (isDeleting) return;
+
+        try
+        {
+            isDeleting = true;
+            var response = await Http.DeleteAsync($"/api/cards/{Card.Id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                await OnDelete.InvokeAsync();
+                Snackbar.Add("Fiszka została usunięta", Severity.Success);
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception(error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Wystąpił błąd podczas usuwania fiszki", Severity.Error);
+        }
+        finally
+        {
+            isDeleting = false;
+        }
+    }
 }

@@ -19,21 +19,21 @@
                             Ilość fiszek: @(Item.Cards?.Count ?? 0)
                         </MudText>
                     </div>
-                    
+
                     <MudIconButton Icon="@(isFullLengthContent ? Icons.Material.Filled.UnfoldLess : Icons.Material.Filled.UnfoldMore)"
-                                   Color="Color.Primary"
-                                   OnClick="ToggleFullLengthContent"
-                                   Size="Size.Small" 
-                                   Title="@(isFullLengthContent ? "Zwiń zawartość" : "Rozwiń zawartość")" />
+                    Color="Color.Primary"
+                    OnClick="ToggleFullLengthContent"
+                    Size="Size.Small" 
+                    Title="@(isFullLengthContent ? "Zwiń zawartość" : "Rozwiń zawartość")" />
                     <MudIconButton Icon="@Icons.Material.Filled.Add"
-                                   Color="Color.Success"
-                                   Size="Size.Small" 
-                                   title="Dodaj fiszkę" />
+                    Color="Color.Success"
+                    Size="Size.Small" 
+                    title="Dodaj fiszkę" />
                     <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                   Color="Color.Error"
-                                   OnClick="OpenDeleteDialog"
-                                   Size="Size.Small" 
-                                   title="Usuń zawartość" />
+                    Color="Color.Error"
+                    OnClick="OpenDeleteDialog"
+                    Size="Size.Small" 
+                    title="Usuń zawartość" />
                 </div>
                 <div class="d-flex align-center gap-2">
                     <MudText Color="Color.Default">
@@ -55,7 +55,8 @@
             <MudItem xs="12" Class="mt-4">
                 @if (Item.Cards != null && Item.Cards.Any())
                 {
-                    <FlashcardsList Cards="@Item.Cards.ToList()" />
+                    <FlashcardsList Cards="@Item.Cards.ToList()"
+                                    OnDeleted="OnDeleteCard"/>
                 }
                 else
                 {
@@ -75,7 +76,7 @@
     public required OriginalContentDto Item { get; set; }
 
     [Parameter]
-    public EventCallback<int> OnDeleted { get; set; }
+    public EventCallback OnDeleted { get; set; }
 
     private bool isExpanded;
     private bool isFullLengthContent = false;
@@ -120,21 +121,21 @@
         };
         var dialog = DialogService.ShowAsync<DeleteDialog>("Usuwanie treści", parameters);
 
-        //await DeleteContent();
+        await DeleteContent();
     }    
 
     private async Task DeleteContent()
     {
         if (isDeleting) return;
-        
+
         try
         {
             isDeleting = true;
             var response = await Http.DeleteAsync($"/api/originalcontents/{Item.Id}");
-            
+
             if (response.IsSuccessStatusCode)
             {                
-                await OnDeleted.InvokeAsync(Item.Id);
+                await OnDeleted.InvokeAsync();
                 Snackbar.Add("Treść została usunięta", Severity.Success);
             }
             else
@@ -150,6 +151,14 @@
         finally
         {
             isDeleting = false;
+        }
+    }
+
+    private async Task OnDeleteCard()
+    {
+        if (OnDeleted.HasDelegate)
+        {
+            await OnDeleted.InvokeAsync();
         }
     }
 }

@@ -1,108 +1,48 @@
 ﻿@using TenXCards.API.Models
 @using MudBlazor
-@inject HttpClient Http
-@inject ILogger<FlashcardsList> Logger
-@inject ISnackbar Snackbar
 
 <MudGrid>
     @foreach (var card in Cards)
     {        
         <MudItem xs="12">
-            <FlashcardItem Card="@card" />
+            <FlashcardItem Card="@card"
+                           OnDelete="OnDeletedCard" />
         </MudItem>
     }
 </MudGrid>
-
-@if (showConfirmDelete)
-{
-    <MudDialog Open="showConfirmDelete" 
-               DisableSidePadding="true">
-        <DialogContent>
-            <MudContainer Class="pa-4">
-                <MudText Typo="Typo.h6" Class="mb-4">Potwierdź usunięcie</MudText>
-                <MudText>Czy na pewno chcesz usunąć tę fiszkę?</MudText>
-            </MudContainer>
-        </DialogContent>
-        <DialogActions>
-            <MudButton Variant="Variant.Text" 
-                      Color="Color.Default" 
-                      OnClick="CancelDelete">Anuluj</MudButton>
-            <MudButton Variant="Variant.Filled" 
-                      Color="Color.Error" 
-                      OnClick="ConfirmDelete">Usuń</MudButton>
-        </DialogActions>
-    </MudDialog>
-}
 
 @code {
     [Parameter]
     public required List<CardDto> Cards { get; set; }
 
     [Parameter]
-    public EventCallback<CardDto> OnCardDeleted { get; set; }
+    public EventCallback OnDeleted { get; set; }
 
-    private bool showConfirmDelete;
-    private CardDto? cardToDelete;
-    private CardDto? cardToEdit;
-    private bool showEditModal;
-
-    private void HandleEdit(CardDto card)
+    private async Task OnDeletedCard()
     {
-        cardToEdit = card;
-        showEditModal = true;
-    }
-
-    private void HandleCardUpdated(CardDto updatedCard)
-    {
-        var index = Cards.FindIndex(c => c.Id == updatedCard.Id);
-        if (index != -1)
+        if (OnDeleted.HasDelegate)
         {
-            Cards[index] = updatedCard;
-            StateHasChanged();
+            await OnDeleted.InvokeAsync();
         }
     }
 
-    private void HandleDelete(CardDto card)
-    {
-        cardToDelete = card;
-        showConfirmDelete = true;
-    }
+    // private CardDto? cardToDelete;
+    // private CardDto? cardToEdit;
+    // private bool showEditModal;
 
-    private void CancelDelete()
-    {
-        showConfirmDelete = false;
-        cardToDelete = null;
-    }
+    // private void HandleEdit(CardDto card)
+    // {
+    //     cardToEdit = card;
+    //     showEditModal = true;
+    // }
 
-    private async Task ConfirmDelete()
-    {
-        if (cardToDelete == null) return;
-
-        try
-        {
-            var response = await Http.DeleteAsync($"api/cards/{cardToDelete.Id}");
-            
-            if (response.IsSuccessStatusCode)
-            {
-                await OnCardDeleted.InvokeAsync(cardToDelete);
-                Cards.Remove(cardToDelete);
-                Snackbar.Add("Fiszka została pomyślnie usunięta", Severity.Success);
-            }
-            else
-            {
-                Logger.LogError("Nie udało się usunąć fiszki: {StatusCode}", response.StatusCode);
-                Snackbar.Add("Nie udało się usunąć fiszki", Severity.Error);
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Błąd podczas usuwania fiszki");
-            Snackbar.Add("Wystąpił błąd podczas usuwania fiszki", Severity.Error);
-        }
-        finally
-        {
-            showConfirmDelete = false;
-            cardToDelete = null;
-        }
-    }
+    // private void HandleCardUpdated(CardDto updatedCard)
+    // {
+    //     var index = Cards.FindIndex(c => c.Id == updatedCard.Id);
+    //     if (index != -1)
+    //     {
+    //         Cards[index] = updatedCard;
+    //         StateHasChanged();
+    //     }
+    // }
 }
