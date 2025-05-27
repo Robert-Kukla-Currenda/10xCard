@@ -15,13 +15,10 @@
     [Parameter]
     public required string Message { get; set; }
 
-    private void ConfirmDelete()    
+    private void ConfirmDelete()
     {
         MudDialog.Close(DialogResult.Ok(true));
     }
 
-    private void CancelDelete()
-    {
-        MudDialog.Cancel();
-    }
+    private void CancelDelete() => MudDialog.Cancel();    
 }

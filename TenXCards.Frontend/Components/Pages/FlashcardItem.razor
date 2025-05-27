@@ -91,9 +91,12 @@
         {
             { "Message", "Czy na pewno chcesz usunąć tę fiszkę?"}
         };
-        var dialog = DialogService.ShowAsync<DeleteDialog>("Usuwanie fiszki", parameters);
-
-        await DeleteFlashcard();
+        var dialog = await DialogService.ShowAsync<DeleteDialog>("Usuwanie fiszki", parameters);
+        var result = await dialog.Result;
+        if (result != null && !result.Canceled)
+        {
+            await DeleteFlashcard();
+        }
     }
 
     private async Task DeleteFlashcard()

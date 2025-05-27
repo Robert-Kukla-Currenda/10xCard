@@ -58,9 +58,9 @@
                 @if (Item.Cards != null && Item.Cards.Any())
                 {
                     <FlashcardsList OriginalContentId="@Item.Id"
-                                    Cards="@Item.Cards.ToList()"
-                                    OnDeleted="OnDeleteCard"
-                                    OnEdit="OnCreateOrEditCard" />
+                    Cards="@Item.Cards.ToList()"
+                    OnDeleted="OnDeleteCard"
+                    OnEdit="OnCreateOrEditCard" />
                 }
                 else
                 {
@@ -126,9 +126,12 @@
         {            
             { "Message", "Czy na pewno chcesz usunąć tę treść wraz ze wszystkimi powiązanymi fiszkami?"}
         };
-        var dialog = DialogService.ShowAsync<DeleteDialog>("Usuwanie treści", parameters);
-
-        await DeleteContent();
+        var dialog = await DialogService.ShowAsync<DeleteDialog>("Usuwanie treści", parameters);
+        var result = await dialog.Result;
+        if (result != null && !result.Canceled)
+        {
+            await DeleteContent();
+        }                
     }    
 
     private async Task DeleteContent()
