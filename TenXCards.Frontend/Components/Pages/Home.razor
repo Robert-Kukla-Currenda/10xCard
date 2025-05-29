@@ -2,6 +2,25 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+<AuthorizeView Context="authContext">
+    <Authorized>
+        <h1>Witaj @authContext.User.Identity?.Name!</h1>
+        <p>
+            Jako zalogowany użytkowniku, możesz wygenerować fiszki przy użyciu naszej sztucznej inteligencji, wklejając tekst, który następnie zostanie przeanalizowany i podzielony na kluczowe informacje.<br />
+            Po automatycznym wygenerowaniu fiszek masz możliwość ich edycji, aby treść idealnie odpowiadała Twoim potrzebom. 
+            Dodatkowo możesz tworzyć, przeglądać i usuwać fiszki ręcznie, co pozwala Ci w pełni zarządzać swoim materiałem edukacyjnym. 
+            Wszystkie zmiany są zapisywane natychmiast, dzięki czemu masz pewność, że Twoje dane są zawsze aktualne.
+        </p>        
+    </Authorized>
+    <NotAuthorized>
+        <p>
+            <strong>Witaj w TenXCards</strong> – aplikacji, która automatycznie generuje wysokiej jakości fiszki edukacyjne przy użyciu AI, aby pomóc Ci efektywniej zapamiętywać materiał.
+            Nasze narzędzie upraszcza proces tworzenia fiszek, umożliwiając zarówno automatyczne generowanie, jak i ręczną edycję treści.
+            Dzięki intuicyjnemu interfejsowi możesz szybko przeglądać, modyfikować i usuwać swoje fiszki, dostosowując je do własnych potrzeb.
+            System został zaprojektowany z myślą o prostocie i bezpieczeństwie, co zapewnia płynne korzystanie z aplikacji.
+        </p>
+        <p>
+            Załóż konto już dziś i odkryj, jak łatwo można zorganizować swoją naukę korzystając z <strong>TenXCards!</strong>
+        </p>        
+    </NotAuthorized>
+</AuthorizeView>
