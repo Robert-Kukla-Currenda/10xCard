@@ -1,8 +1,10 @@
 @page "/user/info"
+@using Microsoft.AspNetCore.Authorization
 @using TenXCards.API.Models
 @using TenXCards.Frontend.Services
 @inject IAuthenticationService AuthService
 @inject NavigationManager NavigationManager
+@attribute [Authorize]
 
 <PageTitle>Informacje o użytkowniku</PageTitle>
 

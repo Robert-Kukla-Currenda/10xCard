@@ -1,4 +1,5 @@
 @page "/dashboard"
+@using Microsoft.AspNetCore.Authorization
 @using TenXCards.API.Models
 @using TenXCards.Frontend.Models
 @using MudBlazor
@@ -6,6 +7,7 @@
 @inject ILogger<Dashboard> Logger
 @inject ISnackbar Snackbar
 @rendermode InteractiveServer
+@attribute [Authorize]
 
 <PageTitle>Panel główny - TenXCards</PageTitle>
 

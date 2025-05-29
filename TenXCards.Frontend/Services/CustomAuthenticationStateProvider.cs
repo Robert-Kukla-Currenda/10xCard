@@ -45,7 +45,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var token = await _sessionStorageService.GetItemAsync<string>("token");
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJyb2JlcnRAY3VycmVuZGEucGwiLCJmaXJzdE5hbWUiOiJSb2JlcnQiLCJsYXN0TmFtZSI6Ikt1a2xhIiwianRpIjoiMTA2OGM5MGMtYTMzYy00Y2NjLTg2MGEtMTQzZDZiZjI1YmM3IiwiZXhwIjoxNzQ4NTUwODY2LCJpc3MiOiJpc3N1ZXIiLCJhdWQiOiJhdWRpZW5jZSJ9.bQW8397KUrcoED_GzrzftylfkYijYtmCC2xAMrt7Xjc";// await _sessionStorageService.GetItemAsync<string>("token");
         if (string.IsNullOrEmpty(token))
         {
             return new AuthenticationState(_anonymous);

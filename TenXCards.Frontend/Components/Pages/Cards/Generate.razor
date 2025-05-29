@@ -1,5 +1,6 @@
 @page "/cards/generate"
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
@@ -9,6 +10,7 @@
 @inject HttpClient Http
 @inject ISnackbar Snackbar
 @rendermode InteractiveServer
+@attribute [Authorize]
 
 <PageTitle>Generowanie fiszki - TenXCards</PageTitle>
 
