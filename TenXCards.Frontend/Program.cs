@@ -1,17 +1,14 @@
-using TenXCards.Frontend.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 using MudBlazor.Services;
-using TenXCards.Frontend.Services;
-using Microsoft.AspNetCore.Components.Authorization;
-using TenXCards.API.Configuration;
+using TenXCards.Frontend.Components;
 using TenXCards.Frontend.Configuration;
-using System;
-using Blazored.SessionStorage;
-using TenXCards.Frontend.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
+using TenXCards.Frontend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<JwtConfiguration>(
+    builder.Configuration.GetSection(JwtConfiguration.SectionName));
 
 //builder.Services.Configure<APIConfiguration>(
 //    builder.Configuration.GetSection(APIConfiguration.SectionName));
