@@ -17,43 +17,52 @@ var builder = WebApplication.CreateBuilder(args);
 //    builder.Configuration.GetSection(APIConfiguration.SectionName));
 
 // Add services to the container.
-builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+//builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
+//builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();      //wróciæ do tej koncepcji
+builder.Services.AddScoped<CustomAuthenticationStateProvider>();
+//builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
+
+//???
+//builder.Services.AddBlazoredSessionStorage();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.IdleTimeout = TimeSpan.FromSeconds(10); // Set session timeout
+});
 
 builder.Services.AddCascadingAuthenticationState();
-
 builder.Services.AddAuthorizationCore();
-builder.Services.AddAuthorization();//.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
 
-//tymczasowo off
-//builder.Services.AddIdentityCore<ApplicationUser>()
-//    .AddUserStore<ApplicationUserStore>()
-//.AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>()
-//.AddSignInManager();
-//.AddDefaultTokenProviders();
-//;
-//builder.Services.ConfigureApplicationCookie(options =>
-//{
-//    // Cookie settings
-//    options.Cookie.HttpOnly = true;
-//    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-
-//    options.LoginPath = "/Identity/Account/Login";
-//    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-//    options.SlidingExpiration = true;
-//});
-
-builder.Services.AddBlazoredSessionStorage();
+//////////tymczasowo off
+//////////builder.Services.AddIdentityCore<ApplicationUser>()
+//////////    .AddUserStore<ApplicationUserStore>()
+//////////.AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>()
+//////////.AddSignInManager();
+//////////.AddDefaultTokenProviders();
+//////////;
+//////////builder.Services.ConfigureApplicationCookie(options =>
+//////////{
+//////////    // Cookie settings
+//////////    options.Cookie.HttpOnly = true;
+//////////    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+////////
+//////////    options.LoginPath = "/Identity/Account/Login";
+//////////    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+//////////    options.SlidingExpiration = true;
+//////////});
 
 builder.Services.AddTransient<ErrorHandlingHttpMessageHandler>();
 builder.Services.AddHttpClient("API", client =>
-                    {    
-                        var apiUrl = builder.Configuration.GetValue<string>("API:Url");
-                        client.BaseAddress = new Uri(apiUrl!);
-                        client.DefaultRequestHeaders.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJyb2JlcnRAY3VycmVuZGEucGwiLCJmaXJzdE5hbWUiOiJSb2JlcnQiLCJsYXN0TmFtZSI6Ikt1a2xhIiwianRpIjoiYTJlMmRjZTktYjc5Mi00NGU0LWI0NmQtNTBiYzVjMWIzZjAxIiwiZXhwIjoxNzQ4MzI5MDAxLCJpc3MiOiJpc3N1ZXIiLCJhdWQiOiJhdWRpZW5jZSJ9.XGZAZlNLurQO7ts2_P7YU83yFO8XjDn_JLPA1yKFLmw");
-                    })
+{
+    var apiUrl = builder.Configuration.GetValue<string>("API:Url");
+    client.BaseAddress = new Uri(apiUrl!);
+})
                 .AddHttpMessageHandler<ErrorHandlingHttpMessageHandler>();
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("API"));
 
@@ -87,6 +96,7 @@ app.UseAntiforgery();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

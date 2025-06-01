@@ -3,7 +3,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using MudBlazor
 @using MudBlazor.Utilities
-@inject IAuthenticationService AuthService
+@inject CustomAuthenticationStateProvider AuthService
 @inject NavigationManager NavigationManager
 
 <AuthorizeView Context="authContext">
@@ -27,9 +27,9 @@
 </AuthorizeView>
 
 @code {
-    private async Task HandleLogout()
+    private void HandleLogout()
     {
-        await AuthService.LogoutAsync();
+        AuthService.Logout();
         NavigationManager.NavigateTo("/");
     }
 }

@@ -1,21 +1,53 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
+using System.Security.Claims;
+using TenXCards.API.Data.Models;
+using TenXCards.API.Models;
+using TenXCards.Frontend.Services.Handlers;
 
 namespace TenXCards.Frontend.Services;
 
 public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 {
-    //private readonly IAuthenticationService _authService;
-    private readonly ISessionStorageService _sessionStorageService;
-    private ClaimsPrincipal _anonymous = new ClaimsPrincipal(new ClaimsIdentity());
+    //private readonly IAuthenticationService _authService;    
+    private readonly ClaimsPrincipal _anonymous = new ClaimsPrincipal(new ClaimsIdentity());
+    private string? _jwtToken;
+    private readonly string _issuer;
+    private readonly string _audience;
 
-    public CustomAuthenticationStateProvider(ISessionStorageService sessionStorageService)
+    private ClaimsPrincipal _user;
+
+    public CustomAuthenticationStateProvider()
     {
+        //todo from configuration
+        _issuer = "issuer";
+        _audience = "audience";
+        
         //_authService = authService;
-        //_authService.AuthenticationStateChanged += OnAuthenticationStateChanged;
-        _sessionStorageService = sessionStorageService;        
+        //_authService.AuthenticationStateChanged += OnAuthenticationStateChanged;        
+    }
+
+    public bool Login(LoginResultDto loginRequestResult)
+    {       
+        if (loginRequestResult == null || string.IsNullOrEmpty(loginRequestResult.Token))
+            return false;
+        var userClaims = ParseClaimsFromJwt(loginRequestResult.Token);
+        _jwtToken = loginRequestResult.Token;
+       
+        if(userClaims == null || !userClaims.Identity.IsAuthenticated)
+        {
+            return false;
+        }
+        
+        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(userClaims)));
+        //NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_user)));
+        return true;
+    }
+
+    public void Logout()
+    {
+        _jwtToken = null;
+        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_anonymous)));
     }
 
     //private void OnAuthenticationStateChanged()
@@ -23,58 +55,19 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     //    NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     //}
 
-    //public override async Task<AuthenticationState> GetAuthenticationStateAsync()
-    //{
-    //    var user = await _authService.GetCurrentUserAsync();
-
-    //    if (user == null)
-    //    {
-    //        return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
-    //    }
-
-    //    var claims = new[]
-    //    {
-    //        new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
-    //        new Claim(ClaimTypes.Email, user.Email),
-    //        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-    //    };
-
-    //    var identity = new ClaimsIdentity(claims, "jwt");
-    //    return new AuthenticationState(new ClaimsPrincipal(identity));
-    //}
-
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJyb2JlcnRAY3VycmVuZGEucGwiLCJmaXJzdE5hbWUiOiJSb2JlcnQiLCJsYXN0TmFtZSI6Ikt1a2xhIiwianRpIjoiMTA2OGM5MGMtYTMzYy00Y2NjLTg2MGEtMTQzZDZiZjI1YmM3IiwiZXhwIjoxNzQ4NTUwODY2LCJpc3MiOiJpc3N1ZXIiLCJhdWQiOiJhdWRpZW5jZSJ9.bQW8397KUrcoED_GzrzftylfkYijYtmCC2xAMrt7Xjc";// await _sessionStorageService.GetItemAsync<string>("token");
-        if (string.IsNullOrEmpty(token))
+        if (string.IsNullOrEmpty(_jwtToken))
         {
             return new AuthenticationState(_anonymous);
         }
-
-        var identity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt"); //JwtParser.ParseClaimsFromJwt(token)
-        var user = new ClaimsPrincipal(identity);
+        
+        var user = ParseClaimsFromJwt(_jwtToken);
         return await Task.FromResult(new AuthenticationState(user));
     }
 
-    public void AuthenticateUser(string token)
+    private ClaimsPrincipal ParseClaimsFromJwt(string jwt)
     {
-        var identity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt"); //JwtParser.ParseClaimsFromJwt(token)
-        var user = new ClaimsPrincipal(identity);
-        var state = new AuthenticationState(user);
-        NotifyAuthenticationStateChanged(Task.FromResult(state));
-    }
-
-    private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
-    {
-        var x = new JwtSecurityTokenHandler();
-        x.ReadJwtToken(jwt);
-
-        var claims = new[] 
-        {
-                new Claim(ClaimTypes.Name, $"Robb Kukk"),
-        //        new Claim(ClaimTypes.Email, user.Email),
-        //        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-            };
-        return claims;
+        return JWTValidationHelper.ValidateJwtToken(jwt, _issuer, _audience);
     }
 }
