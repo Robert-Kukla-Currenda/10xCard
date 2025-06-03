@@ -8,6 +8,7 @@
 @inject ISnackbar Snackbar
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
 <PageTitle>Rejestracja - TenXCards</PageTitle>
 
@@ -126,15 +127,6 @@
     private async Task HandleRegistration(EditContext context)
     {
         if (isProcessing) return;
-        
-        // if (registerCommand?.Password != confirmPassword)
-        // {
-        //     customValidation?.DisplayErrors(new Dictionary<string, List<string>>
-        //     {
-        //         { "ConfirmPassword", new List<string> { "Hasła muszą być identyczne" } }
-        //     });
-        //     return;
-        // }
         
         try
         {

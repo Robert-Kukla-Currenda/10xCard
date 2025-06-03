@@ -1,73 +1,36 @@
 using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.Extensions.Options;
 using System.Security.Claims;
-using TenXCards.API.Configuration;
-using TenXCards.API.Data.Models;
-using TenXCards.API.Models;
-using TenXCards.Frontend.Configuration;
-using TenXCards.Frontend.Services.Handlers;
 
 namespace TenXCards.Frontend.Services;
 
 public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 {
-    //private readonly IAuthenticationService _authService;    
     private readonly ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
-    private string? _jwtToken;
-    private readonly string _issuer;
-    private readonly string _audience;    
+    private readonly IAuthenticationService _authService;    
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public CustomAuthenticationStateProvider(IOptions<JwtConfiguration> jwtConfiguration)
-    {        
-        _issuer = jwtConfiguration.Value.Issuer;
-        _audience = jwtConfiguration.Value.Audience;
-
-        //_authService = authService;
-        //_authService.AuthenticationStateChanged += OnAuthenticationStateChanged;        
-    }
-
-    public bool Login(LoginResultDto loginRequestResult)
+    public CustomAuthenticationStateProvider(IAuthenticationService authService, IHttpContextAccessor httpContextAccessor)
     {
-        if (loginRequestResult == null || string.IsNullOrEmpty(loginRequestResult.Token))
-            return false;
-        var userClaims = ParseClaimsFromJwt(loginRequestResult.Token);
-        _jwtToken = loginRequestResult.Token;
-
-        if (userClaims == null || !userClaims.Identity.IsAuthenticated)
-        {
-            return false;
-        }
-
-        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(userClaims)));
-        //NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_user)));
-        return true;
+        _authService = authService;
+        _authService.AuthenticationStateChanged += AuthenticationStateChangedHandler;
+        _httpContextAccessor = httpContextAccessor;
     }
 
-    public void Logout()
+    private void AuthenticationStateChangedHandler()
     {
-        _jwtToken = null;
-        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_anonymous)));
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
-
-    //private void OnAuthenticationStateChanged()
-    //{
-    //    NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-    //}
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        if (string.IsNullOrEmpty(_jwtToken))
+        var isApiToken = _httpContextAccessor.HttpContext.Request.Cookies.TryGetValue("apiToken", out var apiToken);
+        if (!isApiToken || string.IsNullOrEmpty(apiToken))
         {
             return new AuthenticationState(_anonymous);
         }
 
-        var user = ParseClaimsFromJwt(_jwtToken);
-        return await Task.FromResult(new AuthenticationState(user));
-    }
-
-    private ClaimsPrincipal ParseClaimsFromJwt(string jwt)
-    {
-        return JWTValidationHelper.ValidateJwtToken(jwt, _issuer, _audience);
+        var userClaims = await _authService.GetCurrentUserClaimsFromTokenAsync(apiToken);
+        return new AuthenticationState(userClaims ?? _anonymous);
     }
 }

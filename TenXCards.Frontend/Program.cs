@@ -4,62 +4,51 @@ using MudBlazor.Services;
 using TenXCards.Frontend.Components;
 using TenXCards.Frontend.Configuration;
 using TenXCards.Frontend.Services;
+using TenXCards.Frontend.Services.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<JwtConfiguration>(
-    builder.Configuration.GetSection(JwtConfiguration.SectionName));
+//builder.Services.Configure<JwtConfiguration>(
+//    builder.Configuration.GetSection(JwtConfiguration.SectionName));
+builder.Services.Configure<APIConfiguration>(
+    builder.Configuration.GetSection(APIConfiguration.SectionName));
 
-//builder.Services.Configure<APIConfiguration>(
-//    builder.Configuration.GetSection(APIConfiguration.SectionName));
-
-// Add services to the container.
-//builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
-//builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();      //wróciæ do tej koncepcji
+builder.Services.AddScoped<IdentityRedirectManager>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 //builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
 
-//???
-//builder.Services.AddBlazoredSessionStorage();
-builder.Services.AddDistributedMemoryCache();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddSession(options =>
-{
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-    options.IdleTimeout = TimeSpan.FromSeconds(10); // Set session timeout
-});
+
+//builder.Services.AddBlazoredSessionStorage();
+//builder.Services.AddBlazoredLocalStorage();
+//builder.Services.AddDistributedMemoryCache();
+//builder.Services.AddSession(options =>
+//{
+//    options.Cookie.HttpOnly = true;
+//    options.Cookie.IsEssential = true;
+//    options.IdleTimeout = TimeSpan.FromHours(1);
+//    options.Cookie.SameSite = SameSiteMode.Strict;
+//});
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
-
-//////////tymczasowo off
-//////////builder.Services.AddIdentityCore<ApplicationUser>()
-//////////    .AddUserStore<ApplicationUserStore>()
-//////////.AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>()
-//////////.AddSignInManager();
-//////////.AddDefaultTokenProviders();
-//////////;
-//////////builder.Services.ConfigureApplicationCookie(options =>
-//////////{
-//////////    // Cookie settings
-//////////    options.Cookie.HttpOnly = true;
-//////////    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-////////
-//////////    options.LoginPath = "/Identity/Account/Login";
-//////////    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-//////////    options.SlidingExpiration = true;
-//////////});
+/*builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+})
+    .AddIdentityCookies();*/
 
 builder.Services.AddTransient<ErrorHandlingHttpMessageHandler>();
 builder.Services.AddHttpClient("API", client =>
-{
-    var apiUrl = builder.Configuration.GetValue<string>("API:Url");
-    client.BaseAddress = new Uri(apiUrl!);
-})
+                 {
+                    var apiUrl = builder.Configuration.GetValue<string>("API:Url");
+                    client.BaseAddress = new Uri(apiUrl!);
+                 })
                 .AddHttpMessageHandler<ErrorHandlingHttpMessageHandler>();
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("API"));
 
@@ -93,7 +82,7 @@ app.UseAntiforgery();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSession();
+//app.UseSession();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

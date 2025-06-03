@@ -1,11 +1,10 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 
 namespace TenXCards.Frontend.Services.Handlers
 {
-    public static class JWTValidationHelper
+    public static class JwtValidationHelper
     {
         public static ClaimsPrincipal ValidateJwtToken(string token, string requiredIssuare, string requiredAudience)
         {
