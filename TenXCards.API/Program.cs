@@ -71,6 +71,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
+app.UseCors(cors => cors
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .SetIsOriginAllowed(origin => true)
+    //.AllowCredentials()
+    );
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
