@@ -1,0 +1,145 @@
+@using TenXCards.Frontend.Models
+@using TenXCards.Frontend.Services
+@inject IHttpService HttpService
+@inject ISnackbar Snackbar
+
+<MudDialog MaxWidth="MaxWidth.ExtraLarge" FullWidth="true" Style="width: 85%;">
+    <DialogContent>
+        <MudForm @ref="form" @bind-IsValid="@isValid">
+            <div class="d-flex align-center mud-background-gray pa-4">
+                <MudIcon Icon="@Icons.Material.Filled.FlipToFront" Class="mr-3" />
+                <MudTextField @bind-Value="model.Front"
+                Label="Przód fiszki"
+                Required="true"
+                RequiredError="Przód fiszki jest wymagany"
+                MaxLength="1000"
+                Counter="1000"
+                Lines="3"
+                Immediate="true"
+                Validation="@(new Func<string, IEnumerable<string>>(ValidateFront))"
+                Class="mb-4"
+                Style="width: 100%;" />
+            </div>
+
+            <div class="d-flex align-center mud-background-gray pa-4 mt-5">
+                <MudIcon Icon="@Icons.Material.Filled.FlipToBack" Class="mr-3" />
+                <MudTextField @bind-Value="model.Back"
+                Label="Tył fiszki"
+                Required="true"
+                RequiredError="Tył fiszki jest wymagany"
+                MaxLength="5000"
+                Counter="5000"
+                Lines="8"
+                Immediate="true"
+                Validation="@(new Func<string, IEnumerable<string>>(ValidateBack))"
+                Class="mb-4" />
+            </div>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Anuluj</MudButton>
+        <MudButton Color="Color.Primary" 
+        OnClick="Submit" 
+        Disabled="!isValid"
+        Variant="Variant.Filled">Zapisz</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public required int OriginalContentId { get; set; }
+
+    [Parameter]
+    public CardDto? Card { get; set; }
+
+    private MudForm form = default!;    
+    private SaveCardCommand model = new() { GeneratedBy = "human" };
+    private bool isValid;
+
+    protected override void OnParametersSet()
+    {                
+        model.OriginalContentId = OriginalContentId;
+
+        if (Card != null)
+        {
+            model.Front = Card.Front;
+            model.Back = Card.Back;
+        }
+
+        base.OnParametersSet();
+    }
+
+    private IEnumerable<string> ValidateFront(string front)
+    {
+        if (string.IsNullOrWhiteSpace(front))
+            yield return "Przód fiszki jest wymagany";
+        else if (front.Length < 1)
+            yield return "Przód fiszki musi mieć co najmniej 1 znak";
+        else if (front.Length > 1000)
+            yield return "Przód fiszki nie może być dłuższy niż 1000 znaków";
+    }
+
+    private IEnumerable<string> ValidateBack(string back)
+    {
+        if (string.IsNullOrWhiteSpace(back))
+            yield return "Tył fiszki jest wymagany";
+        else if (back.Length < 1)
+            yield return "Tył fiszki musi mieć co najmniej 1 znak";
+        else if (back.Length > 5000)
+            yield return "Tył fiszki nie może być dłuższy niż 5000 znaków";
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Submit()
+    {
+        try
+        {
+            if (Card == null)
+            {
+                await SaveNewFlashcard();
+            }
+            else
+            {
+                await SaveFlashcardChanges(Card.Id);
+            }
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Wystąpił błąd podczas dodawania fiszki", Severity.Error);
+        }
+    }
+
+    private async Task SaveNewFlashcard()
+    {
+        var response = await HttpService.PostAsJsonAsync("api/cards", model);
+        if (response.IsSuccessStatusCode)
+        {
+            Snackbar.Add("Fiszka została pomyślnie dodana.", Severity.Success);
+            MudDialog.Close();
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            Snackbar.Add(error, Severity.Error);
+        }
+    }
+
+    private async Task SaveFlashcardChanges(int flashcardId)
+    {
+        var response = await HttpService.PutAsJsonAsync($"api/cards/{flashcardId}", model);
+        if (response.IsSuccessStatusCode)
+        {
+            Snackbar.Add("Zmiany zostały pomyślnie zapisane.", Severity.Success);
+            MudDialog.Close();
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            Snackbar.Add(error, Severity.Error);
+        }
+    }
+}

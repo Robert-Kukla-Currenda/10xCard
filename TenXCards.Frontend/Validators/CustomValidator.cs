@@ -45,5 +45,4 @@ namespace TenXCards.Frontend.Validators
             CurrentEditContext?.NotifyValidationStateChanged();
         }
     }
-
 }

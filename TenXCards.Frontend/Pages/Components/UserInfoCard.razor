@@ -1,0 +1,36 @@
+@using TenXCards.Frontend.Models
+
+<MudCard Class="ma-4">
+    <MudCardHeader>
+        <MudText Typo="Typo.h5">Profil Użytkownika</MudText>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudField Label="Imię" Variant="Variant.Outlined">
+                    @UserData.FirstName
+                </MudField>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudField Label="Nazwisko" Variant="Variant.Outlined">
+                    @UserData.LastName
+                </MudField>
+            </MudItem>
+            <MudItem xs="12">
+                <MudField Label="Adres email" Variant="Variant.Outlined">
+                    @UserData.Email
+                </MudField>
+            </MudItem>
+            <MudItem xs="12">
+                <MudField Label="Data utworzenia konta" Variant="Variant.Outlined">
+                    @UserData.CreatedAt.ToLocalTime().ToString("f")
+                </MudField>
+            </MudItem>
+        </MudGrid>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter]
+    public required UserDto UserData { get; set; }
+}

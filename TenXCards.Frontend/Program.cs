@@ -1,61 +1,24 @@
-using Microsoft.AspNetCore.Components.Authorization;
-using MudBlazor;
-using MudBlazor.Services;
-using TenXCards.Frontend.Components;
-using TenXCards.Frontend.Configuration;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using TenXCards.Frontend;
 using TenXCards.Frontend.Services;
-using TenXCards.Frontend.Services.Handlers;
+using Microsoft.AspNetCore.Components.Authorization;
+using MudBlazor.Services;
+using MudBlazor;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
 
-//builder.Services.Configure<JwtConfiguration>(
-//    builder.Configuration.GetSection(JwtConfiguration.SectionName));
-builder.Services.Configure<APIConfiguration>(
-    builder.Configuration.GetSection(APIConfiguration.SectionName));
+var apiUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? builder.HostEnvironment.BaseAddress;
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiUrl) });
 
-builder.Services.AddScoped<IdentityRedirectManager>();
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<CustomAuthenticationStateProvider>();
-//builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
-
-builder.Services.AddHttpContextAccessor();
-
-//builder.Services.AddBlazoredSessionStorage();
-//builder.Services.AddBlazoredLocalStorage();
-//builder.Services.AddDistributedMemoryCache();
-//builder.Services.AddSession(options =>
-//{
-//    options.Cookie.HttpOnly = true;
-//    options.Cookie.IsEssential = true;
-//    options.IdleTimeout = TimeSpan.FromHours(1);
-//    options.Cookie.SameSite = SameSiteMode.Strict;
-//});
-
-builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<IHttpService, HttpService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddAuthorizationCore();
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication();
-/*builder.Services.AddAuthentication(options =>
-{
-    options.DefaultScheme = IdentityConstants.ApplicationScheme;
-    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-})
-    .AddIdentityCookies();*/
 
-builder.Services.AddTransient<ErrorHandlingHttpMessageHandler>();
-builder.Services.AddHttpClient("API", client =>
-                 {
-                    var apiUrl = builder.Configuration.GetValue<string>("API:Url");
-                    client.BaseAddress = new Uri(apiUrl!);
-                 })
-                .AddHttpMessageHandler<ErrorHandlingHttpMessageHandler>();
-builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("API"));
-
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
-
-//Add MudBlazor services
 builder.Services.AddMudServices(config =>
 {
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
@@ -67,24 +30,4 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.ShowTransitionDuration = 500;
 });
 
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-app.MapStaticAssets();
-app.UseAntiforgery();
-
-app.UseAuthentication();
-app.UseAuthorization();
-//app.UseSession();
-
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
-
-app.Run();
+await builder.Build().RunAsync();

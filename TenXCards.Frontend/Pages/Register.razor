@@ -1,0 +1,163 @@
+@page "/register"
+@using TenXCards.Frontend.Models
+@using TenXCards.Frontend.Services
+@using TenXCards.Frontend.Validators
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@inject ISnackbar Snackbar
+@inject IHttpService HttpService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Rejestracja - TenXCards</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="pa-4">
+    <MudPaper Elevation="3" Class="pa-4">
+        <MudText Typo="Typo.h4" Class="mb-4" Align="Align.Center">Zarejestruj się</MudText>
+
+        <EditForm Model="registerCommand" OnValidSubmit="HandleRegistration" FormName="register">
+            <DataAnnotationsValidator />
+            <CustomValidation @ref="customValidation"/>
+
+            <div class="mb-3">                
+                <InputText @bind-Value="registerCommand.Email"
+                class="form-control"
+                id="email"
+                type="email"
+                maxlength="255"
+                placeholder="Email" />
+                <ValidationMessage For="@(() => registerCommand.Email)" />
+            </div>
+
+            <div class="mb-3">                
+                <InputText @bind-Value="registerCommand.FirstName"
+                class="form-control"
+                id="firstName"
+                maxlength="100"
+                placeholder="Imię" />
+                <ValidationMessage For="@(() => registerCommand.FirstName)" />
+            </div>
+
+            <div class="mb-3">                
+                <InputText @bind-Value="registerCommand.LastName"
+                class="form-control"
+                id="lastName"
+                maxlength="100"
+                placeholder="Nazwisko" />
+                <ValidationMessage For="@(() => registerCommand.LastName)" />
+            </div>
+
+            <div class="mb-4">                
+                <InputText @bind-Value="registerCommand.Password"
+                class="form-control"
+                id="password"
+                type="password"
+                maxlength="100"
+                placeholder="Hasło"
+                @oninput="ValidatePasswordMatch" />
+                <ValidationMessage For="@(() => registerCommand.Password)" />
+            </div>
+
+            <div class="mb-4">
+                <InputText @bind-Value="confirmPassword"
+                class="form-control"
+                id="confirmPassword"
+                type="password"
+                maxlength="100"
+                placeholder="Powtórz hasło"
+                @oninput="ValidatePasswordMatch" />
+                <ValidationMessage For="@(() => confirmPassword)" />
+            </div>
+
+            <MudText Typo="Typo.caption" Color="Color.Error" Class="mb-4">
+                @* <ValidationSummary /> *@
+            </MudText>
+
+            <MudButton ButtonType="ButtonType.Submit"
+            Variant="Variant.Filled"
+            Color="Color.Primary"
+            Size="Size.Large"
+            FullWidth="true"
+            Disabled="@isProcessing">
+                @if (isProcessing)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Przetwarzanie...</MudText>
+                }
+                else
+                {
+                    <MudText>Zarejestruj się</MudText>
+                }
+            </MudButton>
+        </EditForm>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [SupplyParameterFromForm]
+    private RegisterUserCommand? registerCommand { get; set; }
+    private CustomValidation? customValidation;
+    private bool isProcessing = false;
+    private string confirmPassword = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        registerCommand ??= new RegisterUserCommand();
+    }
+
+    private void ValidatePasswordMatch()
+    {
+        if (string.IsNullOrEmpty(confirmPassword) || string.IsNullOrEmpty(registerCommand?.Password))
+            return;
+
+        if (registerCommand.Password != confirmPassword)
+        {
+            customValidation?.DisplayErrors(new Dictionary<string, List<string>>
+            {
+                { "ConfirmPassword", new List<string> { "Hasła muszą być identyczne" } }
+            });
+        }
+        else
+        {
+            customValidation?.ClearErrors();
+        }
+    }
+
+    private async Task HandleRegistration(EditContext context)
+    {
+        if (isProcessing) return;
+
+        try
+        {
+            isProcessing = true;
+            
+            var response = await HttpService.PostAsJsonAsync("api/users/register", registerCommand!);            
+            if (response.IsSuccessStatusCode)
+            {
+                var user = await response.Content.ReadFromJsonAsync<UserDto>();                
+                Snackbar.Add($"Rejestracja zakończona pomyślnie!", Severity.Success);
+                NavigationManager.NavigateTo("login");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                Snackbar.Add("Użytkownik o podanym adresie email już istnieje.", Severity.Error);
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                Snackbar.Add("Wprowadzone dane są nieprawidłowe. Sprawdź formularz i spróbuj ponownie.", Severity.Error);
+            }
+            else
+            {
+                Snackbar.Add("Wystąpił nieoczekiwany błąd. Spróbuj ponownie później.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Wystąpił błąd podczas komunikacji z serwerem. Spróbuj ponownie później.", Severity.Error);
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+}

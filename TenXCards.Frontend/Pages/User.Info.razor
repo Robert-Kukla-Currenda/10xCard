@@ -1,0 +1,57 @@
+﻿@page "/user/info"
+@using TenXCards.Frontend.Models
+@using TenXCards.Frontend.Pages.Components
+@using TenXCards.Frontend.Services
+@inject IHttpService HttpService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Informacje o użytkowniku</PageTitle>
+
+@if (_loading)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else if (_error != null)
+{
+    <MudAlert Severity="Severity.Error" Class="my-2">@_error</MudAlert>
+    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="LoadUserDataAsync">Spróbuj ponownie</MudButton>
+}
+else if (_userData != null)
+{
+    <UserInfoCard UserData="@_userData" />
+}
+
+@code {
+    private bool _loading = true;
+    private string? _error;
+    private UserDto? _userData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUserDataAsync();
+    }
+
+    private async Task LoadUserDataAsync()
+    {
+        try
+        {
+            _loading = true;
+            _error = null;
+
+            _userData = await HttpService.GetAsync<UserDto>("api/users/me");
+            
+            if (_userData == null)
+            {
+                _error = "Nie udało się załadować danych użytkownika. Spróbuj ponownie później.";                
+            }
+        }
+        catch
+        {
+            _error = "Wystąpił błąd podczas ładowania danych użytkownika.";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}
