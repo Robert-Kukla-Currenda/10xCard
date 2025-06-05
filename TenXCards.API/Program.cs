@@ -16,22 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
-builder.Services.AddHttpClient();
-//builder.Services.AddHttpClient<OpenRouterService>((serviceProvider, client) =>
-//{
-//    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-//    var baseUrl = configuration["OpenRouter:ApiEndpoint"]
-//        ?? "https://openrouter.ai/api/v1/";
-
-//    client.BaseAddress = new Uri(baseUrl);
-//    client.DefaultRequestHeaders.Add("User-Agent", "FlashCards/1.0");
-//});
-// .AddPolicyHandler((serviceProvider, _) => 
-// {
-//     var logger = serviceProvider.GetRequiredService<ILogger<OpenRouterService>>();
-//     return RetryPolicies.GetHttpRetryPolicy(logger);
-// });
-
+builder.Services.AddHttpClient<OpenRouterService>();
 
 builder.Services.Configure<JwtOptions>(
     builder.Configuration.GetSection(JwtOptions.SectionName));
@@ -75,7 +60,6 @@ app.UseCors(cors => cors
     .AllowAnyMethod()
     .AllowAnyHeader()
     .SetIsOriginAllowed(origin => true)
-    //.AllowCredentials()
     );
 
 // Configure the HTTP request pipeline.

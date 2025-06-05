@@ -18,7 +18,7 @@ namespace TenXCards.API.Services.OpenRouter
 
         public OpenRouterService(
             ILogger<OpenRouterService> logger,
-            HttpClient httpClient,            
+            HttpClient httpClient,
             IOptions<AIServiceOptions> options,
             IErrorLoggingService errorLoggingService,
             IHttpClientFactory factory)
@@ -27,11 +27,13 @@ namespace TenXCards.API.Services.OpenRouter
             _options = options.Value;
             _httpClient = httpClient;
             _errorLoggingService = errorLoggingService;
-            
 
-            _httpClient.BaseAddress = new Uri(_options.OpenRouterUrl);            
-            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_options.OpenRouterApiKey}");            
-
+            _httpClient.BaseAddress = new Uri(_options.OpenRouterUrl);                        
+            var openRouterApiKey = Environment.GetEnvironmentVariable("TENXCARDS_OPENROUTER_API_KEY") ?? _options.OpenRouterApiKey;
+            if (!string.IsNullOrEmpty(openRouterApiKey))
+            {
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {openRouterApiKey}");
+            }
 
             _modelParameters = new ModelParameters
             {
