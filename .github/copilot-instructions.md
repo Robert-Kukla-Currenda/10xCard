@@ -161,6 +161,75 @@ This document provides best practices and guidelines for working on backend appl
 
 ---
 
+## Testing
+
+### Unit Testing Best Practices
+
+- **Naming Conventions:**
+  - Test classes should be named according to the system under test (SUT).
+  - Test methods should follow the pattern: MethodName_StateUnderTest_ExpectedBehavior or Should_ExpectedBehavior_When_StateUnderTest.
+  - Use descriptive names for test cases using the [Theory] attribute.
+
+- **Test Structure (AAA):**
+  - **Arrange:** Set up data and configuration.
+  - **Act:** Execute the method under test.
+  - **Assert:** Verify results with a single logical assertion or use BeEquivalentTo for multiple checks.
+
+- **xUnit Best Practices:**
+  - Use [Fact] for single scenarios and [Theory] for parameterized tests.
+  - Utilize IClassFixture or CollectionFixture for expensive setups.
+  - Ensure tests are isolated from dependencies.
+  - Group tests using the [Trait] attribute.
+
+- **FluentAssertions:**
+  - Use semantic assertions for collections, exceptions, and object comparisons.
+  - Prefer using BeEquivalentTo over chaining multiple Should() calls.
+
+- **AutoFixture:**
+  - Automate test data generation to minimize manual object creation.
+  - Globally customize the data generator to avoid “magic” values.
+
+- **TestContainers for Integration Tests:**
+  - Use IClassFixture to run a database container only once.
+  - Reset the database state before each test or use a new container.
+
+- **WireMock.NET:**
+  - Create dedicated stubs to simulate external APIs.
+  - Verify that HTTP calls are executed as expected.
+
+- **Mocking (NSubstitute/Moq):**
+  - Design based on interfaces.
+  - Verify interactions with dependencies.
+
+- **Asynchronous Tests:**
+  - Use async/await for asynchronous methods.
+  - Test exceptions in asynchronous methods properly.
+
+- **General QA Principles:**
+  - Tests should be fast (ideally less than 50 ms) and have a single responsibility.
+  - Avoid real connections to external systems (use WireMock or interfaces).
+  - Limit time-based assertions (avoid sleep calls).
+  - Ensure tests are CI-compatible (no GUI interactions and clear error messages).
+  - Focus on detecting significant edge cases and following TDD rather than achieving high code coverage.
+
+  ### Guidelines for E2E
+
+#### PLAYWRIGHT
+
+- Initialize configuration only with Chromium/Desktop Chrome browser
+- Use browser contexts for isolating test environments
+- Implement the Page Object Model for maintainable tests
+- Use locators for resilient element selection
+- Leverage API testing for backend validation
+- Implement visual comparison with expect(page).toHaveScreenshot()
+- Use the codegen tool for test recording
+- Leverage trace viewer for debugging test failures
+- Implement test hooks for setup and teardown
+- Use expect assertions with specific matchers
+- Leverage parallel execution for faster test runs
+
+---
+
 ## General Recommendations
 
 - **Continuous Integration/Continuous Deployment (CI/CD)**:  

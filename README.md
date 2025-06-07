@@ -8,6 +8,10 @@
 - **Backend:** .NET 8 for building robust applications, with PostgreSQL 17 as the database.
 - **AI Integration:** Communication with various AI models via Openrouter.ai for efficient and cost-effective flashcard generation.
 - **CI/CD & Hosting:** Github Actions for automated pipelines and DigitalOcean for containerized hosting.
+- **Testing:** 
+  - Unit Tests: xUnit, FluentAssertions, AutoFixture, and TestContainers for database testing
+  - E2E Tests: Playwright for end-to-end automated browser testing
+  - Additional: bUnit for Blazor component testing, NBomber for performance testing
 
 ## Getting Started Locally
 1. **Clone the repository:**
@@ -42,9 +46,11 @@
   ```sh
   dotnet run
   ```
-- **Run tests (if available):**
+- **Run tests:**
   ```sh
-  dotnet test
+  dotnet test                           # Run all tests
+  dotnet test --filter "Category=Unit"  # Run only unit tests
+  dotnet test --filter "Category=E2E"   # Run only E2E tests
   ```
 
 ## Project Scope

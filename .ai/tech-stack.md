@@ -18,5 +18,27 @@ Pozwala na ustawianie limitów finansowych na klucze API
 
 ## 4. CI/CD
 CI/CD i Hosting:
-Github Actions do tworzenia pipeline’ów CI/CD
+Github Actions do tworzenia pipeline'ów CI/CD
 DigitalOcean do hostowania aplikacji za pośrednictwem obrazu docker
+
+## 5. Narzędzia testowe
+### Testy jednostkowe
+- xUnit jako główny framework testowy
+- FluentAssertions do czytelnych asercji
+- TestContainers do testów integracyjnych z bazą danych PostgreSQL
+- WireMock.NET do mockowania zewnętrznych API
+- AutoFixture do generowania danych testowych
+- Coverlet do mierzenia pokrycia kodu testami
+
+### Testy E2E
+- Playwright do testów end-to-end (zamiast Selenium)
+- bUnit do testowania komponentów Blazor
+- Axe dla testów dostępności
+- NBomber jako narzędzie do testów obciążeniowych
+
+### Dodatkowe narzędzia
+- Storybook do izolowanego testowania komponentów UI
+- OWASP ZAP do automatycznego skanowania podatności
+- SonarQube z pluginem Security do statycznej analizy bezpieczeństwa
+- Snyk do monitorowania podatności w zależnościach
+- Application Insights do monitorowania wydajności
