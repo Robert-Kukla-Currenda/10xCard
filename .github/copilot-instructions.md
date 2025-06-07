@@ -65,13 +65,16 @@ This document provides best practices and guidelines for working on backend appl
   - _Imports.razor – A file importing namespaces and other resources used in the Blazor application.
   - App.razor – The main component of the Blazor application, defining the layout and router of the application.
   - Program.cs – The entry point of the application, configuring services and starting the Blazor application.
-  - {{projest_name}}.csproj – The .NET project file defining dependencies and project settings.
+  - TenXCards.Frontend.csproj – The .NET project file defining dependencies and project settings.
 - **Folders**:
   - bin/ and obj/ – Automatically generated folders by the .NET build system, containing binaries and temporary files.
-  - Layout/ – Contains application layouts, e.g., MainLayout.razor, which defines the main page layout.
-  - Pages/ – A folder storing Blazor application pages (e.g., .razor components representing different views).
-  - Properties/ – Contains project configuration files.
-  - wwwroot/ – A public folder containing static resources such as CSS, JavaScript, images, etc.
+  - Layout/ – Contains application layouts, including:
+  - Models/ – Contains data models and DTOs including:
+  - Pages/ – A folder containing Blazor pages and components:
+  - Services/ – Service implementations including:
+  - Validators/ – Validation logic:
+  - Properties/ – Contains project configuration files (launchSettings.json)
+  - wwwroot/ – A public folder containing static resources:
 
 ### Clean Code for Frontend Applications (Blazor)
 
