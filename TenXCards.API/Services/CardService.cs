@@ -1,16 +1,15 @@
-using System.ComponentModel.DataAnnotations;
-using System.Data;
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Exceptions;
+using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.Text.Json;
 using TenXCards.API.Configuration;
 using TenXCards.API.Controllers;
 using TenXCards.API.Data;
 using TenXCards.API.Data.Models;
 using TenXCards.API.Exceptions;
-using TenXCards.API.Migrations;
 using TenXCards.API.Models;
 using TenXCards.API.Models.OpenRouter;
 
@@ -20,34 +19,24 @@ public class CardService : ICardService
 {
     private const string CACHE_CARD_PREFIX = "card_{userId}";
 
-    private readonly HttpClient _httpClient;
     private readonly ApplicationDbContext _dbContext;
     private readonly ILogger<CardService> _logger;
-    private readonly AIServiceOptions _options;
     private readonly IMemoryCache _cache;
     private readonly IOptions<CacheOptions> _cacheOptions;
     private readonly IOpenRouterService _openRouterService;
 
     public CardService(
-        HttpClient httpClient,
         ApplicationDbContext dbContext,
         ILogger<CardService> logger,
-        IOptions<AIServiceOptions> options,
         IMemoryCache cache,
         IOptions<CacheOptions> cacheOptions,
         IOpenRouterService openRouterService)
     {
-        _httpClient = httpClient;
         _dbContext = dbContext;
-        _logger = logger;
-        _options = options.Value;
+        _logger = logger;        
         _cache = cache;
         _cacheOptions = cacheOptions;
         _openRouterService = openRouterService;
-
-        // Konfiguracja HttpClient dla OpenRouter
-        //_httpClient.BaseAddress = new Uri(_options.OpenRouterUrl);
-        //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_options.OpenRouterApiKey}");
     }
 
     #region Save Card

@@ -1,12 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using TenXCards.API.Data;
 using TenXCards.API.Data.Models;
-using TenXCards.API.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using TenXCards.API.Exceptions;
 using TenXCards.API.Jwt;
-using BC=BCrypt.Net.BCrypt;
+using TenXCards.API.Models;
+using BC = BCrypt.Net.BCrypt;
 
 namespace TenXCards.API.Services
 {
