@@ -20,8 +20,7 @@ namespace TenXCards.API.Services.OpenRouter
             ILogger<OpenRouterService> logger,
             HttpClient httpClient,
             IOptions<AIServiceOptions> options,
-            IErrorLoggingService errorLoggingService,
-            IHttpClientFactory factory)
+            IErrorLoggingService errorLoggingService)
         {
             _logger = logger;
             _options = options.Value;
