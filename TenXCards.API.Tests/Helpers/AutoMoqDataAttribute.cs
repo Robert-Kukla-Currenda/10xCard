@@ -9,7 +9,14 @@ public class AutoMoqDataAttribute : AutoDataAttribute
 {
     public AutoMoqDataAttribute()
         : base(() => new Fixture().Customize(new AutoMoqCustomization()))
-            //new AutoNSubstituteCustomization()))
+    {
+    }
+}
+
+public class AutoNSubstituteAttribute : AutoDataAttribute
+{
+    public AutoNSubstituteAttribute()
+        : base(() => new Fixture().Customize(new AutoNSubstituteCustomization()))
     {
     }
 }
