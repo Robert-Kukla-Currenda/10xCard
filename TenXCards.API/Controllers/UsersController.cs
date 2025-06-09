@@ -73,15 +73,14 @@ namespace TenXCards.API.Controllers
             {
                 var result = await _userService.Login(command);
                 return Ok(result);
-            }
-            catch (UnauthorizedAccessException ex)
+            }            catch (UnauthorizedAccessException)
             {
                 _logger.LogWarning("Failed login attempt for user {Email}", command.Email);
                 return Unauthorized(new { message = "Invalid credentials" });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "Error during login for user {Email}", command.Email);
+                _logger.LogError("Error during login for user {Email}", command.Email);
                 return StatusCode(500, new { message = "An error occurred during login" });
             }
         }

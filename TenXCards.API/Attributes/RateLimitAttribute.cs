@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System.Net;
-using System.Security.Claims;
 using TenXCards.API.Options;
 
 namespace TenXCards.API.Attributes
@@ -57,7 +56,7 @@ namespace TenXCards.API.Attributes
                 {
                     StatusCode = (int)HttpStatusCode.TooManyRequests
                 };
-                context.HttpContext.Response.Headers.Add("Retry-After", retryAfter.TotalSeconds.ToString());
+                context.HttpContext.Response.Headers.Append("Retry-After", retryAfter.TotalSeconds.ToString());
                 return;
             }
 

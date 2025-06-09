@@ -49,7 +49,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = builder.Configuration[$"{JwtOptions.SectionName}:Issuer"],
             ValidAudience = builder.Configuration[$"{JwtOptions.SectionName}:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration[$"{JwtOptions.SectionName}:SecretKey"]))
+                Encoding.UTF8.GetBytes(builder.Configuration[$"{JwtOptions.SectionName}:SecretKey"] 
+                    ?? throw new InvalidOperationException($"Configuration value for '{JwtOptions.SectionName}:SecretKey' is not set.")))
         };
     });
 

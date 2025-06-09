@@ -23,14 +23,13 @@ namespace TenXCards.API.Middleware
             var path = context.Request.Path.Value;
             if (path?.Contains("/api/users/login") == true)
             {
-                var ipAddress = context.Connection.RemoteIpAddress?.ToString();
+                var ipAddress = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
                 var cacheKey = $"login-attempt:{ipAddress}";
-
                 var attempts = _cache.GetOrCreate(cacheKey, entry =>
                 {
                     entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(15));
                     return new AttemptInfo { Count = 0, FirstAttempt = DateTime.UtcNow };
-                });
+                }) ?? new AttemptInfo { Count = 0, FirstAttempt = DateTime.UtcNow };
 
                 if (attempts.Count >= 5)
                 {
