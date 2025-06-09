@@ -1,4 +1,4 @@
-name: Run Tests
+name: Build and Tests for TenXCards.API
 
 on:
   push:
@@ -25,5 +25,5 @@ jobs:
       run: dotnet build TenXCards.API --no-restore
       
     - name: Run API unit tests
-      run: dotnet test TenXCards.API.Tests --no-build --verbosity normal --collect:"XPlat Code Coverage"
+      run: dotnet test TenXCards.API.Tests --verbosity normal --collect:"XPlat Code Coverage"
       
