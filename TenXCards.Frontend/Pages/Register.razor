@@ -95,19 +95,19 @@
 
 @code {
     [SupplyParameterFromForm]
-    private RegisterUserCommand? registerCommand { get; set; }
+    private RegisterUserCommand registerCommand { get; set; } = new();
     private CustomValidation? customValidation;
     private bool isProcessing = false;
     private string confirmPassword = string.Empty;
 
     protected override void OnInitialized()
     {
-        registerCommand ??= new RegisterUserCommand();
+        registerCommand = new RegisterUserCommand();
     }
 
     private void ValidatePasswordMatch()
     {
-        if (string.IsNullOrEmpty(confirmPassword) || string.IsNullOrEmpty(registerCommand?.Password))
+        if (string.IsNullOrEmpty(confirmPassword) || string.IsNullOrEmpty(registerCommand.Password))
             return;
 
         if (registerCommand.Password != confirmPassword)
@@ -131,7 +131,7 @@
         {
             isProcessing = true;
             
-            var response = await HttpService.PostAsJsonAsync("api/users/register", registerCommand!);            
+            var response = await HttpService.PostAsJsonAsync("api/users/register", registerCommand);            
             if (response.IsSuccessStatusCode)
             {
                 var user = await response.Content.ReadFromJsonAsync<UserDto>();                
@@ -151,7 +151,7 @@
                 Snackbar.Add("Wystąpił nieoczekiwany błąd. Spróbuj ponownie później.", Severity.Error);
             }
         }
-        catch (Exception ex)
+        catch
         {
             Snackbar.Add("Wystąpił błąd podczas komunikacji z serwerem. Spróbuj ponownie później.", Severity.Error);
         }

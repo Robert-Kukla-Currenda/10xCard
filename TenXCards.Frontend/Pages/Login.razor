@@ -74,14 +74,9 @@
 
 @code {
     [SupplyParameterFromForm]
-    private LoginUserCommand? loginCommand { get; set; }
+    private LoginUserCommand loginCommand { get; set; } = new();
     private bool isProcessing = false;
-
-    protected override async Task OnInitializedAsync()
-    {
-        loginCommand ??= new LoginUserCommand { Email = "robert@currenda.pl", Password = "AlaMaKota1" };
-    }
-
+    
     private async Task HandleLogin()
     {
         if (isProcessing) return;
@@ -93,9 +88,16 @@
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<LoginResultDto>();
-                await AuthService.LoginAsync(result);
-                Snackbar.Add("Jesteś zalogowany.", Severity.Success);
-                NavigationManager.NavigateTo("/");
+                if (result is not null)
+                {
+                    await AuthService.LoginAsync(result);
+                    Snackbar.Add("Jesteś zalogowany.", Severity.Success);
+                    NavigationManager.NavigateTo("/");
+                }
+                else
+                {
+                    Snackbar.Add("Otrzymano nieprawidłową odpowiedź z serwera.", Severity.Error);
+                }
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {

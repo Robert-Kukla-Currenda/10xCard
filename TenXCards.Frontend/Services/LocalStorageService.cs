@@ -5,7 +5,7 @@ namespace TenXCards.Frontend.Services
 {
     public interface ILocalStorageService
     {
-        Task<T> GetItemAsync<T>(string key);
+        Task<T?> GetItemAsync<T>(string key);
         Task SetItemAsync<T>(string key, T value);
         Task RemoveItemAsync(string key);
     }
@@ -19,7 +19,7 @@ namespace TenXCards.Frontend.Services
             _jsRuntime = jsRuntime;
         }
 
-        public async Task<T> GetItemAsync<T>(string key)
+        public async Task<T?> GetItemAsync<T>(string key)
         {
             var json = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", key);
             if (json == null)

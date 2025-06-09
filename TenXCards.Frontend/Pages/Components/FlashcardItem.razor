@@ -31,12 +31,12 @@
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                         Color="Color.Primary"
                         Size="Size.Small"
-                        Title="Edytuj"
+                        title="Edytuj"
                         OnClick="OpenEditCardDialog" />
                         <MudIconButton Icon="@Icons.Material.Filled.Delete"
                         Color="Color.Error"
                         Size="Size.Small"
-                        Title="Usuń"
+                        title="Usuń"
                         OnClick="OpenDeleteDialog" />
                     </div>
 
@@ -121,7 +121,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add("Wystąpił błąd podczas usuwania fiszki", Severity.Error);
+            Snackbar.Add($"Wystąpił błąd podczas usuwania fiszki: {ex.Message}", Severity.Error);
         }
         finally
         {

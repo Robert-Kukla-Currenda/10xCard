@@ -25,11 +25,11 @@
                     Color="Color.Primary"
                     OnClick="ToggleFullLengthContent"
                     Size="Size.Small" 
-                    Title="@(isFullLengthContent ? "Zwiń zawartość" : "Rozwiń zawartość")" />
+                    title="@(isFullLengthContent ? "Zwiń zawartość" : "Rozwiń zawartość")" />
                     <MudIconButton Icon="@Icons.Material.Filled.Add"
                     Color="Color.Success"
                     Size="Size.Small" 
-                    Title="Dodaj fiszkę"
+                    title="Dodaj fiszkę"
                     OnClick="OpenCreateCardDialog" />
                     <MudIconButton Icon="@Icons.Material.Filled.Delete"
                     Color="Color.Error"
@@ -156,7 +156,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add("Wystąpił błąd podczas usuwania treści", Severity.Error);
+            Snackbar.Add($"Wystąpił błąd podczas usuwania treści: {ex.Message}", Severity.Error);
         }
         finally
         {
