@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Playwright;
 
 namespace TenXCards.E2E.Tests;
 
@@ -18,7 +19,7 @@ public sealed class BasicNavigationTests : PlaywrightTest
         
         // Act
         // Navigate to the application URL (replace with actual URL when deployed)
-        await page.GotoAsync("https://localhost:5001");
+        await page.GotoAsync("https://localhost:7069");
         
         // Assert
         // Check that the page loaded successfully
