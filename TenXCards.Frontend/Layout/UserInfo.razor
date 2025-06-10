@@ -9,7 +9,8 @@
         <MudMenu Icon="@Icons.Material.Filled.AccountCircle" 
                 Color="Color.Inherit" 
                 direction="Direction.Bottom" 
-                offsetY="true">
+                offsetY="true"
+                Class="signedin">
             <MudText Class="px-4 py-2">@context.User.Identity?.Name</MudText>
             <MudDivider />
             <MudMenuItem OnClick="HandleLogout">Wyloguj się</MudMenuItem>
