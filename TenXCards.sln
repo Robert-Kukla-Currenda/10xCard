@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TenXCards.Frontend", "TenXC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TenXCards.API.Tests", "TenXCards.API.Tests\TenXCards.API.Tests.csproj", "{76EEC24C-A50A-4277-B5DC-CD353A8B270F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TenXCards.E2E.Tests", "TenXCards.E2E.Tests\TenXCards.E2E.Tests.csproj", "{C91FF192-3C06-46D8-A24D-85F40B02D53A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{76EEC24C-A50A-4277-B5DC-CD353A8B270F}.Release|x64.Build.0 = Release|Any CPU
 		{76EEC24C-A50A-4277-B5DC-CD353A8B270F}.Release|x86.ActiveCfg = Release|Any CPU
 		{76EEC24C-A50A-4277-B5DC-CD353A8B270F}.Release|x86.Build.0 = Release|Any CPU
+		{C91FF192-3C06-46D8-A24D-85F40B02D53A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C91FF192-3C06-46D8-A24D-85F40B02D53A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C91FF192-3C06-46D8-A24D-85F40B02D53A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C91FF192-3C06-46D8-A24D-85F40B02D53A}.Debug|x64.Build.0 = Debug|Any CPU
+		{C91FF192-3C06-46D8-A24D-85F40B02D53A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C91FF192-3C06-46D8-A24D-85F40B02D53A}.Debug|x86.Build.0 = Debug|Any CPU
+		{C91FF192-3C06-46D8-A24D-85F40B02D53A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C91FF192-3C06-46D8-A24D-85F40B02D53A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C91FF192-3C06-46D8-A24D-85F40B02D53A}.Release|x64.ActiveCfg = Release|Any CPU
+		{C91FF192-3C06-46D8-A24D-85F40B02D53A}.Release|x64.Build.0 = Release|Any CPU
+		{C91FF192-3C06-46D8-A24D-85F40B02D53A}.Release|x86.ActiveCfg = Release|Any CPU
+		{C91FF192-3C06-46D8-A24D-85F40B02D53A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

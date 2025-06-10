@@ -1,0 +1,38 @@
+{
+  "TestSettings": {
+    "BaseUrl": "https://localhost:5001",
+    "Browser": "chromium",
+    "Headless": true,
+    "SlowMo": 50,
+    "Viewport": {
+      "Width": 1280,
+      "Height": 720
+    },
+    "Screenshots": {
+      "Path": "./Screenshots",
+      "TakeOnFailure": true
+    },
+    "Timeouts": {
+      "Navigation": 30000,
+      "Action": 10000,
+      "Expect": 5000
+    },
+    "TestUsers": {
+      "Admin": {
+        "Email": "admin@example.com",
+        "Password": "AdminPassword123!"
+      },
+      "RegularUser": {
+        "Email": "user@example.com",
+        "Password": "UserPassword123!"
+      }
+    }
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  }
+}
