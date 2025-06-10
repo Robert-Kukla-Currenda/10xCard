@@ -2,6 +2,11 @@ html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+/* Ustawienie rozmiaru wszystkich nagłówków h1 na 24px */
+h1, .mud-typography-h1 {
+    font-size: 2em !important;
+}
+
 h1:focus {
     outline: none;
 }
