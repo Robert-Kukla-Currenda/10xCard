@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Playwright;
 using TenXCards.E2E.Tests.Helpers;
 
@@ -13,7 +10,7 @@ public sealed class BasicNavigationTests : PlaywrightTest
     private IBrowser? _browser;
     private IBrowserContext? _context;
     private IPage? _page;
-    private string _baseUrl = "https://localhost:7069";
+    private string _baseUrl = string.Empty;
 
     [TestInitialize]
     public override void TestInitialize()
@@ -54,6 +51,8 @@ public sealed class BasicNavigationTests : PlaywrightTest
     
     private async Task SetupBrowserAsync()
     {
+        _baseUrl = TestSettings.BaseUrl;
+
         // Setup browser with configured options
         _browser = await Playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {

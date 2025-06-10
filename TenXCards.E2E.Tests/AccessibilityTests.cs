@@ -11,7 +11,7 @@ public class AccessibilityTests : PlaywrightTest
     private IBrowser? _browser;
     private IBrowserContext? _context;
     private IPage? _page;
-    private string _baseUrl = "https://localhost:7069";
+    private string _baseUrl = string.Empty;
 
     [TestInitialize]
     public override void TestInitialize()
@@ -85,6 +85,8 @@ public class AccessibilityTests : PlaywrightTest
 
     private async Task SetupBrowserAsync()
     {
+        _baseUrl = TestSettings.BaseUrl;
+
         // Setup browser with configured options
         _browser = await Playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {

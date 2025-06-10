@@ -23,7 +23,7 @@ public static class TestSettings
     }
     
     // Base URL of the application under test
-    public static string BaseUrl => Configuration["TestSettings:BaseUrl"] ?? "https://localhost:5001";
+    public static string BaseUrl => Configuration["TestSettings:BaseUrl"] ?? "https://localhost:7069";
     
     // Browser settings
     public static string Browser => Configuration["TestSettings:Browser"] ?? "chromium";
@@ -46,16 +46,16 @@ public static class TestSettings
     // Test user credentials
     public static class Users
     {
-        public static class Admin
+        public static class Valid
         {
-            public static string Email => Configuration["TestSettings:TestUsers:Admin:Email"] ?? "admin@example.com";
-            public static string Password => Configuration["TestSettings:TestUsers:Admin:Password"] ?? "AdminPassword123!";
+            public static string Email => Configuration["TestSettings:TestUsers:Valid:Email"] ?? "x@xx.pl";
+            public static string Password => Configuration["TestSettings:TestUsers:Valid:Password"] ?? "AlaMaKota1";
         }
         
-        public static class RegularUser
+        public static class Invalid
         {
-            public static string Email => Configuration["TestSettings:TestUsers:RegularUser:Email"] ?? "user@example.com";
-            public static string Password => Configuration["TestSettings:TestUsers:RegularUser:Password"] ?? "UserPassword123!";
+            public static string Email => Configuration["TestSettings:TestUsers:Invalid:Email"] ?? "user@example.com";
+            public static string Password => Configuration["TestSettings:TestUsers:Invalid:Password"] ?? "UserPassword123!";
         }
     }
 }

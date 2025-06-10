@@ -24,7 +24,7 @@ public abstract class BasePage
     {
         await Page.ScreenshotAsync(new PageScreenshotOptions
         {
-            Path = $"./Screenshots/{name}_{DateTime.Now:yyyyMMdd_HHmmss}.png",
+            Path = $"./Screenshots/{name}.png",
             FullPage = true
         });
     }
@@ -43,11 +43,14 @@ public class LoginPage : BasePage
     private ILocator EmailInput => Page.Locator("input[type='email']");
     private ILocator PasswordInput => Page.Locator("input[type='password']");
     private ILocator LoginButton => Page.Locator("button[type='submit']");
-    private ILocator ErrorMessage => Page.Locator(".error-message");
+    private ILocator ErrorMessage => Page.Locator(".mud-snackbar");
 
     public override async Task<bool> IsPageLoadedAsync()
     {
-        return await EmailInput.IsVisibleAsync() && await PasswordInput.IsVisibleAsync();
+        var emailVisible = await EmailInput.IsVisibleAsync();
+        var passwordVisible = await PasswordInput.IsVisibleAsync();
+        var loginButtonVisible = await LoginButton.IsVisibleAsync();
+        return emailVisible && passwordVisible && loginButtonVisible;
     }
 
     public async Task LoginAsync(string email, string password)
@@ -59,9 +62,11 @@ public class LoginPage : BasePage
 
     public async Task<string> GetErrorMessageAsync()
     {
-        if (await ErrorMessage.IsVisibleAsync())
+        var errorMessageVisible = await ErrorMessage.IsVisibleAsync();
+        if (errorMessageVisible)
         {
-            return await ErrorMessage.TextContentAsync();
+            var snackbarText = await ErrorMessage.TextContentAsync();
+            return snackbarText ?? string.Empty;
         }
         
         return string.Empty;
@@ -69,25 +74,20 @@ public class LoginPage : BasePage
 }
 
 /// <summary>
-/// Dashboard page object
+/// Signed in home page object
 /// </summary>
-public class DashboardPage : BasePage
+public class SignedInHomePage : BasePage
 {
-    public DashboardPage(IPage page) : base(page)
+    public SignedInHomePage(IPage page) : base(page)
     {
     }
 
     // Locators
-    private ILocator WelcomeMessage => Page.Locator("h1.welcome-message");
-    private ILocator CardsList => Page.Locator(".card-list");
+    private ILocator SignedInMenu => Page.Locator("div.signedin");    
     
     public override async Task<bool> IsPageLoadedAsync()
     {
-        return await WelcomeMessage.IsVisibleAsync() && await CardsList.IsVisibleAsync();
-    }
-
-    public async Task<int> GetCardsCountAsync()
-    {
-        return await Page.Locator(".card-item").CountAsync();
+        var isSignedInMenu = await SignedInMenu.IsVisibleAsync();
+        return isSignedInMenu;
     }
 }
