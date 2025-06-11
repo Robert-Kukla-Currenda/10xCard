@@ -71,6 +71,18 @@ public class LoginPage : BasePage
         
         return string.Empty;
     }
+
+    public async Task<string> GetSnackbarMessageAsync()
+    {
+        var errorMessageVisible = await ErrorMessage.IsVisibleAsync();
+        if (errorMessageVisible)
+        {
+            var snackbarText = await ErrorMessage.TextContentAsync();
+            return snackbarText ?? string.Empty;
+        }
+
+        return string.Empty;
+    }
 }
 
 /// <summary>
@@ -83,11 +95,54 @@ public class SignedInHomePage : BasePage
     }
 
     // Locators
-    private ILocator SignedInMenu => Page.Locator("div.signedin");    
+    private ILocator SignedInMenu => Page.Locator("div.signedin");
+    private ILocator LogoutMenuItem => Page.Locator("text=Wyloguj się");
+    private ILocator SignedInMenuButton => Page.Locator("div.signedin");
     
     public override async Task<bool> IsPageLoadedAsync()
     {
         var isSignedInMenu = await SignedInMenu.IsVisibleAsync();
         return isSignedInMenu;
+    }
+    
+    public async Task LogoutAsync()
+    {
+        await SignedInMenuButton.ClickAsync();
+        await LogoutMenuItem.ClickAsync();
+    }
+}
+
+
+/// <summary>
+/// Signed out home page object
+/// </summary>
+public class SignedOutHomePage : BasePage
+{
+    public SignedOutHomePage(IPage page) : base(page)
+    {
+    }
+
+    // Locators
+    private ILocator WelcomeText => Page.Locator("text=Witaj w TenXCards!");
+    private ILocator SnackbarMessage => Page.Locator(".mud-snackbar");
+
+    public override async Task<bool> IsPageLoadedAsync()
+    {
+        var isSignedOutWelcomeText = await WelcomeText.IsVisibleAsync();
+        return isSignedOutWelcomeText;
+    }
+
+    public async Task<string> GetSnackbarMessageAsync()
+    {
+        // After logout, the user should be redirected to the home page
+        // and a snackbar message should be displayed
+        var snackbarVisibile = await SnackbarMessage.IsVisibleAsync();
+        if (snackbarVisibile)
+        {
+            var snackbarText = await SnackbarMessage.TextContentAsync();
+            return snackbarText ?? string.Empty;
+        }
+
+        return string.Empty;
     }
 }

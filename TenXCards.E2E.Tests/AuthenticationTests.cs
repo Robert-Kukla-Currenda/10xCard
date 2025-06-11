@@ -49,24 +49,40 @@ public class AuthenticationTests : PlaywrightTest
         await loginPage.TakeScreenshotAsync("authentication-login-page");        
 
         // Verify login page loaded
-        var loginResult = await loginPage.IsPageLoadedAsync();
-        loginResult.Should().Be(true, "Login page should be loaded before performing login");        
+        var isLoginPage = await loginPage.IsPageLoadedAsync();
+        isLoginPage.Should().Be(true, "Login page should be loaded before performing login");        
         
         // Act - perform login
         await loginPage.LoginAsync(TestSettings.Users.Valid.Email, TestSettings.Users.Valid.Password);
 
-        // Niezbut elegancie, ale nie WaitForLoad nie dzia³a w tym przypadku poprawnie
+        // Niezbut elegancie, ale nie WaitForLoad nie dziaï¿½a w tym przypadku poprawnie
         Thread.Sleep(2000);
 
         // Take a screenshot for reference
         await signedInHomePage.TakeScreenshotAsync("authentication-home-page");        
 
         // Assert - should be redirected to home page
-        var homePageLoadResult = await signedInHomePage.IsPageLoadedAsync();
-        homePageLoadResult.Should().BeTrue("After successful login, user should be redirected to the home page");
+        var isLoggedHomePage = await signedInHomePage.IsPageLoadedAsync();
+        isLoggedHomePage.Should().BeTrue("After successful login, user should be redirected to the home page");
 
-        // Goto logout page
-        //todo
+        Thread.Sleep(3000);
+
+        // Act - Logout from application
+        await signedInHomePage.LogoutAsync();
+        await signedInHomePage.TakeScreenshotAsync("authentication-logout1-page");
+        
+        // Wait for logout process to complete and UI to update
+        Thread.Sleep(2000);
+
+        // Initialize signed out home page object
+        var signedOutHomePage = new SignedOutHomePage(_page);
+
+        // Take a screenshot after logout
+        await signedOutHomePage.TakeScreenshotAsync("authentication-signedout-page");        
+        
+        // Assert - should be logged out and redirected to home page
+        var signedOutMessage = await signedOutHomePage.GetSnackbarMessageAsync();
+        signedOutMessage.Should().Be("ZostaÅ‚eÅ› wylogowany.", "After successful logout, user should be logged out and see login option");
     }
     
     [TestMethod]
@@ -96,7 +112,7 @@ public class AuthenticationTests : PlaywrightTest
         // Act - perform login with invalid credentials
         await loginPage.LoginAsync(TestSettings.Users.Invalid.Email, TestSettings.Users.Invalid.Password);
 
-        // Niezbut elegancie, ale nie WaitForLoad nie dzia³a w tym przypadku poprawnie
+        // Niezbut elegancie, ale nie WaitForLoad nie dziaï¿½a w tym przypadku poprawnie
         Thread.Sleep(2000);
 
         // Take a screenshot for reference
@@ -104,7 +120,7 @@ public class AuthenticationTests : PlaywrightTest
 
         // Assert - should show error message
         var errorMessage = await loginPage.GetErrorMessageAsync();
-        errorMessage.Should().Be("Nieprawid³owy email lub has³o.");        
+        errorMessage.Should().Be("Nieprawidï¿½owy email lub hasï¿½o.");        
     }
 
     private async Task SetupBrowserAsync()
