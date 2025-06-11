@@ -119,7 +119,7 @@ public class AuthenticationTests : PlaywrightTest
 
         // Assert - should show error message
         var errorMessage = await loginPage.GetErrorMessageAsync();
-        errorMessage.Should().Be("Nieprawid�owy email lub has�o.");        
+        errorMessage.Should().Be("Nieprawidłowy email lub hasło.");        
     }
 
     private async Task SetupBrowserAsync()
