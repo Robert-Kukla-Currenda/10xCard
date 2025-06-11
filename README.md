@@ -21,7 +21,7 @@
    ```
 
 2. **Install dependencies:**
-   - Ensure [.NET 8](https://dotnet.microsoft.com/download) and [PostgreSQL 17](https://www.postgresql.org/download/) are installed.
+   - Ensure [.NET 9](https://dotnet.microsoft.com/download) and [PostgreSQL 17](https://www.postgresql.org/download/) are installed.
    - Restore project dependencies:
      ```sh
      dotnet restore
@@ -49,15 +49,15 @@
 - **Run tests:**
   ```sh
   dotnet test                           # Run all tests
-  dotnet test --filter "Category=Unit"  # Run only unit tests
-  dotnet test --filter "Category=E2E"   # Run only E2E tests
+  dotnet test TenXCards.API.Tests       # Run only unit tests
+  dotnet test TenXCards.E2E.Tests       # Run only E2E tests
   ```
 
 ## Project Scope
 - **AI Generated Flashcards:** Automatically generate flashcards based on user-submitted text using summarization techniques.
 - **Manual Flashcard Creation:** Allow users to manually create, edit, view, and delete flashcards.
 - **User Accounts:** Simple registration and authentication for secure access to personal flashcards.
-- **Integration with Spaced Repetition:** Future integration with a spaced repetition algorithm to enhance learning.
+- **Integration with Spaced Repetition:** Future integration with a spaced repetition algorithm to enhance learning (not implemented).
 
 ## Project Status
 The project is currently in the MVP stage. Core functionalities such as flashcard generation and user management have been implemented, and further improvements including enhanced UI/UX and performance optimizations are underway.
