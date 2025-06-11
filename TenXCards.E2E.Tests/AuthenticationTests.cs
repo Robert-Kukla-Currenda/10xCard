@@ -69,7 +69,6 @@ public class AuthenticationTests : PlaywrightTest
 
         // Act - Logout from application
         await signedInHomePage.LogoutAsync();
-        await signedInHomePage.TakeScreenshotAsync("authentication-logout1-page");
         
         // Wait for logout process to complete and UI to update
         Thread.Sleep(2000);
